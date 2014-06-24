@@ -1,7 +1,5 @@
 package nl.viking.controllers.annotation
 
-import nl.viking.controllers.ControllerConstants
-
 import java.lang.annotation.ElementType
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy

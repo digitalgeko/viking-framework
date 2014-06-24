@@ -1,11 +1,7 @@
 package nl.viking.model.morphia
 
-import com.mongodb.BasicDBObject
 import nl.viking.db.GMongoDBFactory
-import nl.viking.db.MorphiaFactory
 import org.bson.types.ObjectId
-
-import java.util.regex.Matcher
 
 /**
  * User: mardo

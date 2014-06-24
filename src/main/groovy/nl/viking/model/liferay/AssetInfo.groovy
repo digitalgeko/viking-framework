@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
-import nl.viking.model.hibernate.GenericModel
 import nl.viking.model.hibernate.Model
 import org.codehaus.jackson.annotate.JsonIgnore
 

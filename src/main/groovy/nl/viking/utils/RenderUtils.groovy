@@ -1,6 +1,5 @@
 package nl.viking.utils
 
-import groovy.transform.Synchronized
 import nl.viking.controllers.Controller
 import nl.viking.controllers.response.DoNothing
 import nl.viking.controllers.response.Redirect

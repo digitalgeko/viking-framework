@@ -1,13 +1,7 @@
 package nl.viking.enhancers
 
-import nl.viking.db.HibernateFactory
-import nl.viking.db.MorphiaFactory
 import nl.viking.model.hibernate.Model
-import org.bson.types.ObjectId
 import org.hibernate.Criteria
-import org.hibernate.Query
-import org.hibernate.Session
-import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 
 /**

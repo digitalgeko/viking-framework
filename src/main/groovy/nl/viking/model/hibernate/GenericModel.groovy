@@ -1,7 +1,6 @@
 package nl.viking.model.hibernate
 
 import nl.viking.db.HibernateFactory
-import org.hibernate.Criteria
 import org.hibernate.Session
 
 import javax.persistence.MappedSuperclass

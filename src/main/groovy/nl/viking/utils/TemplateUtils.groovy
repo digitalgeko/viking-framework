@@ -1,6 +1,5 @@
 package nl.viking.utils
 
-import com.liferay.portal.util.PortalUtil
 import freemarker.template.Configuration
 import freemarker.template.Template
 import nl.viking.Conf
@@ -8,11 +7,9 @@ import nl.viking.VikingPortlet
 import nl.viking.controllers.DataHelper
 import nl.viking.controllers.router.JSRouterFreemarkerMethod
 import nl.viking.controllers.router.JSi18nFreemarkerMethod
-import nl.viking.controllers.router.Router
 import nl.viking.controllers.router.RouterFreemarkerMethod
 
 import javax.servlet.ServletContext
-import javax.servlet.http.HttpServletRequest
 
 /**
  * Created with IntelliJ IDEA.

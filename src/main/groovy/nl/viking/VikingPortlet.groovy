@@ -1,54 +1,22 @@
 package nl.viking
 
-import com.liferay.portal.kernel.util.JavaConstants
 import com.liferay.portal.util.PortalUtil
-import com.liferay.portlet.PortletConfigFactoryUtil
 import nl.viking.controllers.Controller
-import nl.viking.controllers.DataHelper
 import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render
 import nl.viking.controllers.annotation.Resource
-import nl.viking.db.GMongoDBFactory
 import nl.viking.db.HibernateFactory
-import nl.viking.db.MorphiaFactory
-import nl.viking.enhancers.GMongoModelEnhancer
-import nl.viking.enhancers.HibernateGenericModelEnhancer
-import nl.viking.enhancers.HibernateModelEnhancer
 import nl.viking.enhancers.ModelEnhancer
-import nl.viking.enhancers.MorphiaModelEnhancer
 import nl.viking.logging.Logger
-import nl.viking.model.gmongo.GMongoModel
-import nl.viking.model.hibernate.GenericModel
-import nl.viking.model.hibernate.Model
 import nl.viking.utils.RenderUtils
 import nl.viking.utils.TemplateUtils
-import org.codehaus.groovy.control.CompilationFailedException
-import org.hibernate.Session
 import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.util.ClasspathHelper
-import org.reflections.util.ConfigurationBuilder
-import org.reflections.util.FilterBuilder
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import javax.persistence.Entity
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.GenericPortlet
-import javax.portlet.PortletConfig
-import javax.portlet.PortletException
-import javax.portlet.PortletMode
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse
-
-import javax.portlet.ResourceRequest
-import javax.portlet.ResourceResponse
+import javax.portlet.*
 import javax.servlet.ServletContext
-import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
-import java.lang.reflect.Method
-
 
 class VikingPortlet extends GenericPortlet
 {

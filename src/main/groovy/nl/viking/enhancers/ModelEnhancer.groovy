@@ -1,7 +1,6 @@
 package nl.viking.enhancers
 
 import nl.viking.Conf
-import nl.viking.logging.Logger
 import nl.viking.model.hibernate.GenericModel
 import nl.viking.model.hibernate.Model
 import org.reflections.Reflections

@@ -1,8 +1,6 @@
 package nl.viking.controllers.router
 
 import com.liferay.portal.kernel.util.WebKeys
-import com.liferay.portal.theme.PortletDisplay
-import com.liferay.portal.theme.ThemeDisplay
 import nl.viking.Conf
 import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render

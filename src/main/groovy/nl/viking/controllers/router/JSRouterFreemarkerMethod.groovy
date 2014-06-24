@@ -1,10 +1,6 @@
 package nl.viking.controllers.router
 
-import freemarker.template.SimpleScalar
-import freemarker.template.SimpleSequence
-import freemarker.template.TemplateMethodModelEx
-import freemarker.template.TemplateModel
-import freemarker.template.TemplateModelException
+import freemarker.template.*
 import nl.viking.Conf
 
 /**

@@ -1,9 +1,6 @@
 package nl.viking.enhancers
 
-import com.google.code.morphia.query.Query
-import nl.viking.db.MorphiaFactory
 import nl.viking.model.gmongo.GMongoModel
-import nl.viking.model.morphia.Model
 import org.bson.types.ObjectId
 
 /**

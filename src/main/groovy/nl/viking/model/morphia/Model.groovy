@@ -2,7 +2,6 @@ package nl.viking.model.morphia
 
 import com.google.code.morphia.Datastore
 import com.google.code.morphia.annotations.Id
-import com.google.code.morphia.annotations.PrePersist
 import com.google.code.morphia.annotations.Transient
 import com.google.code.morphia.query.Query
 import nl.viking.db.MorphiaFactory

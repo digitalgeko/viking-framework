@@ -4,7 +4,6 @@ import nl.viking.controllers.DataHelper
 import nl.viking.i18n.ContextualMessageInterpolatorLocale
 
 import javax.validation.Configuration
-import javax.validation.ConstraintViolation
 import javax.validation.Validation
 import javax.validation.ValidatorFactory
 

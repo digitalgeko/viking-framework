@@ -1,9 +1,4 @@
 package nl.viking
-
-import org.apache.commons.configuration.CompositeConfiguration
-import org.apache.commons.configuration.ConfigurationException
-import org.apache.commons.configuration.PropertiesConfiguration
-
 /**
  * Created with IntelliJ IDEA.
  * User: mardo

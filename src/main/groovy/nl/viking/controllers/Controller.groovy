@@ -10,18 +10,11 @@ import nl.viking.controllers.response.Redirect
 import nl.viking.controllers.router.Router
 import nl.viking.data.binding.Bind
 import nl.viking.data.validation.Validator
-import nl.viking.db.HibernateFactory
 import nl.viking.utils.TemplateUtils
 import org.apache.commons.io.IOUtils
 import org.codehaus.jackson.map.ObjectMapper
 
-import javax.portlet.ActionRequest
-import javax.portlet.ActionResponse
-import javax.portlet.PortletPreferences
-import javax.portlet.RenderRequest
-import javax.portlet.RenderResponse
-import javax.portlet.ResourceRequest
-import javax.portlet.ResourceResponse
+import javax.portlet.*
 
 /**
  * Created with IntelliJ IDEA.

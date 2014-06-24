@@ -1,30 +1,15 @@
 package nl.viking.db
 
-import com.jolbox.bonecp.provider.BoneCPConnectionProvider
-import com.liferay.portal.kernel.util.PropertiesParamUtil
 import com.liferay.portal.kernel.util.PropsUtil
-import com.liferay.portal.kernel.util.UnicodeProperties
-import com.liferay.portal.model.PortalPreferences
-import com.liferay.portal.service.CompanyLocalServiceUtil
-import com.liferay.portal.service.PortalPreferencesLocalServiceUtil
-import com.liferay.portal.util.PortalUtil
-import com.liferay.portal.util.PortletKeys
 import groovy.transform.Synchronized
 import nl.viking.Conf
 import nl.viking.VikingPortlet
-import nl.viking.controllers.Controller
 import nl.viking.db.hibernate.strategy.VikingNamingStrategy
 import nl.viking.logging.Logger
-import nl.viking.model.hibernate.Model
-import nl.viking.model.internal.hibernate.VikingMessageEntry
-import org.hibernate.Criteria
-import org.hibernate.Hibernate
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.hibernate.cfg.AnnotationConfiguration
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
-import org.hibernate.criterion.Restrictions
 import org.reflections.Reflections
 
 import javax.persistence.Entity

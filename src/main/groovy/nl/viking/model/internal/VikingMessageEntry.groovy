@@ -2,11 +2,8 @@ package nl.viking.model.internal
 
 import com.google.code.morphia.annotations.Entity
 import com.google.code.morphia.annotations.Indexed
-import com.google.code.morphia.query.Query
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.morphia.Model
-import org.hibernate.criterion.Restrictions
-
 
 /**
  * User: mardo
