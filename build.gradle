@@ -7,7 +7,7 @@ apply plugin: 'sonar-runner'
 
 def groupId = 'org.vikingportlets'
 def artifactId = "viking-framework"
-def versionNumber = '0.2.23'
+def versionNumber = '0.2.24'
 
 group = groupId
 version = versionNumber
