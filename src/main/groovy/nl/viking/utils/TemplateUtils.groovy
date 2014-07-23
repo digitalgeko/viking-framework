@@ -43,7 +43,6 @@ class TemplateUtils {
 	}
 
 	static Configuration getFreemarkerConfiguration(request, response) {
-		println "new freemarker configuration"
 		if (freemarkerConfigurationSingleton == null) {
 			ServletContext servletContext = VikingPortlet.currentServletContext;
 			freemarkerConfigurationSingleton = new Configuration();

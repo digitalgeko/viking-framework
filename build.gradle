@@ -6,8 +6,8 @@ apply plugin: 'sonar-runner'
 
 
 def groupId = 'org.vikingportlets'
-def artifactId = "viking-framework"
-def versionNumber = '0.2.24'
+def artifactId = project.name
+def versionNumber = '0.2.26'
 
 group = groupId
 version = versionNumber
@@ -23,9 +23,9 @@ jar {
 }
 
 repositories {
-    mavenRepo url: "http://repo.maven.apache.org/maven2"
-    mavenRepo url: "http://morphia.googlecode.com/svn/mavenrepo"
-    mavenRepo url: "http://repo1.maven.org/maven2/com/fasterxml/jackson/"
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://morphia.googlecode.com/svn/mavenrepo" }
+    maven { url "http://repo1.maven.org/maven2/com/fasterxml/jackson/" }
 }
 
 configurations {

@@ -53,12 +53,12 @@ class HibernateFactory {
 			}
 
 			// Hibernate entities
-
-			def modelPackages = ['models']
+			def additionalModelPackages = Conf.properties.models.additionalPackages ?: []
+			def modelPackages = ['models'] + additionalModelPackages
 
 			modelPackages.each {
 				def reflections = new Reflections(it)
-				Set<Class<?>> modelClasses = reflections.getTypesAnnotatedWith(Entity.class);
+				Set<Class<?>> modelClasses = reflections.getTypesAnnotatedWith(Entity.class) + reflections.getTypesAnnotatedWith(org.hibernate.annotations.Entity.class);
 				modelClasses.each{ type ->
 					cfg.addAnnotatedClass(type);
 				}
