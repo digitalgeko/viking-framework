@@ -55,7 +55,9 @@ Go to:
 Uncompress the zip, install it somewhere in your file system and add viking-shell/bin to your **$PATH.**
 
 You should also add this to your ~/.profile (or any other profile file you have) to make gradle build faster:
-`export GRADLE_OPTS="-Xmx768m -Dorg.gradle.daemon=true"`
+```
+export GRADLE_OPTS="-Xmx768m -Dorg.gradle.daemon=true"
+```
 
 ## Hello world
 Let’s execute the “new-project” command, this will prompt you asking for the project name, let’s type “MyProject” for example. Then it will ask you for the liferay version you want to use, we’ll choose Liferay 6.2.1 GA2 in this example. This will create the project structure you need including:
