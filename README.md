@@ -95,6 +95,12 @@ Deploy the project's dependencies.
 #### deploy
 Build and deploy the active project
 
+To build the theme project:
+```
+deploy --target theme
+```
+
+
 #### full-deploy
 Deploy the project and its dependencies.
 
