@@ -127,7 +127,7 @@ class VikingPortlet extends GenericPortlet
 		controllerInstance.init()
 		controllerThreadLocal.set(controllerInstance)
 
-		if (!viewTemplate) viewTemplate = "${controller.simpleName}/${action}.ftl"
+		if (!viewTemplate) viewTemplate = "${controllerInstance.templatesFolder}/${action}.ftl"
 		controllerInstance.viewTemplate = viewTemplate
 
 		controller.getMethod(action).annotations.each {

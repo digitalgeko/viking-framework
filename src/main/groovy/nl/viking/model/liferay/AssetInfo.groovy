@@ -71,7 +71,9 @@ class AssetInfo {
 
 	def fill(DataHelper h) {
 		if (h) {
-			userId = h.user.userId
+			if (h.user) {
+				userId = h.user.userId
+			}
 			groupId = h.themeDisplay.scopeGroupId
 		}
 	}

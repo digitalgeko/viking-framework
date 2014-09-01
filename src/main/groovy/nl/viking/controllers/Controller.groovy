@@ -238,4 +238,8 @@ class Controller {
 		}
 		return null
 	}
+
+	def getTemplatesFolder() {
+		return this.class.simpleName
+	}
 }
