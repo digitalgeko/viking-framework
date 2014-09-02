@@ -30,8 +30,6 @@
 
 ## Installation
 
-***Currently, only MacOS is supported, support for Linux and Windows is on the way***
-
 Install viking-shell, it's all you need to setup your viking projects.
 
 Go to:
