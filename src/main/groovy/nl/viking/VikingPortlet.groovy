@@ -157,11 +157,7 @@ class VikingPortlet extends GenericPortlet
 
 	@Override
 	def void processAction(ActionRequest request, ActionResponse response) {
-		if (PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
-			routeMethod(PortalUtil.getUploadPortletRequest(request), response, request)
-		} else {
-			routeMethod(request, response)
-		}
+		routeMethod(request, response)
 	}
 
 	@Override
@@ -195,11 +191,7 @@ class VikingPortlet extends GenericPortlet
 
 	@Override
 	void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException, IOException {
-		if (PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
-			routeMethod(PortalUtil.getUploadPortletRequest(request), response, request)
-		} else {
-			routeMethod(request, response)
-		}
+		routeMethod(request, response)
 	}
 
 	@PreDestroy

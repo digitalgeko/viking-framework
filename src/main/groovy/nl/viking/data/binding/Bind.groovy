@@ -1,7 +1,9 @@
 package nl.viking.data.binding
 
 import com.liferay.portal.kernel.upload.UploadPortletRequest
+import com.liferay.portal.util.PortalUtil
 import groovy.json.JsonSlurper
+import nl.viking.Conf
 import nl.viking.data.validation.Validator
 import nl.viking.logging.Logger
 import nl.viking.model.morphia.Blob
@@ -27,15 +29,24 @@ class Bind {
 		new Bind(request: request).bind(paramName, clazz, listClass, targetObject)
 	}
 
+	def getUploadRequest() {
+		if (Conf.properties.allowParametersWithoutPrefix && request.method.equalsIgnoreCase("POST")) {
+			return request
+		}
+
+		if (!PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
+			throw new Exception("Form request is not multipart/form-data, add [enctype='multipart/form-data'] attribute to your HTML form")
+		}
+		return PortalUtil.getUploadPortletRequest(request)
+	}
+
 	def <T> T bind(String paramName, Class<T> clazz, Class listClass = null, T targetObject = null) {
         if (File.class.isAssignableFrom(clazz)) {
-            return request.getFile(paramName)
+			def uploadRequest = getUploadRequest()
+            return uploadRequest.getFile(paramName)
         } else if (Blob.class.isAssignableFrom(clazz)){
-            if (request instanceof UploadPortletRequest) {
-                return Blob.create(request.getFile(paramName), request.getFileName(paramName))
-            } else {
-                throw new Exception("Form request is not multipart/form-data, add [enctype='multipart/form-data'] attribute to your HTML form")
-            }
+			def uploadRequest = getUploadRequest()
+			return Blob.create(uploadRequest.getFile(paramName), uploadRequest.getFileName(paramName))
         } else {
             def values = request.getParameterValues(paramName)
             if (values && values.size() > 0) {
@@ -95,7 +106,6 @@ class Bind {
         }.collect{
             paramName + "." + firstElement(it, paramName)
         }
-
 
         if (!objParameterNames.isEmpty()) {
             if (clazz == Date.class) {
@@ -172,11 +182,11 @@ class Bind {
 		def tempObj = mapper.readValue(jsonText, clazz)
 
 		def targetObject
-		def json = new JsonSlurper().parseText(jsonText)
+		Map json = new JsonSlurper().parseText(jsonText)
 		if (retrieveModelById && isModel(clazz) && json.id) {
 			targetObject = clazz.findById(json.id)
 			targetObject.properties.findAll {!['id', "_id", "created", "updated", "class"].contains(it.key)}.each {
-				if (tempObj[it.key] != null) {
+				if (json.containsKey(it.key)) {
 					try {
 						targetObject[it.key] = tempObj[it.key]
 					} catch (ReadOnlyPropertyException e) {
