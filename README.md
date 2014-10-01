@@ -20,13 +20,27 @@
 # Getting started
 ## Prerequisites
 * JDK >= 7 
+
+### Mac OS
 * brew ([http://brew.sh/](http://brew.sh/))
+
+### Ubuntu/debian
+* apt-get
+
+### Other operating systems
+
+If you use Mac OS, Ubuntu or Debian: Viking shell will automatically download the libreries it requires (using brew and apt-get respectively). If you use a different operating system (i.e. Windows), you must manually install:
+
 * Gradle ([http://www.gradle.org/](http://www.gradle.org/))
-* Git ([http://git-scm.com/](http://git-scm.com/))
-* Coffeescript ([http://coffeescript.org/](http://coffeescript.org/))
 * MySQL ([http://www.mysql.com/](http://www.mysql.com/))
+* Git ([http://git-scm.com/](http://git-scm.com/))
+* Maven ([http://maven.apache.org/](http://maven.apache.org/))
+
+
+### Recommended (commonly mandatory on viking projects)
+* Coffeescript ([http://coffeescript.org/](http://coffeescript.org/))
 * MongoDB ([http://www.mongodb.org/](http://www.mongodb.org/))
-* Liferay ([http://liferay.com/](http://liferay.com/))
+
 
 ## Installation
 
@@ -36,6 +50,8 @@ Go to:
 [https://github.com/digitalgeko/viking-shell/releases](https://github.com/digitalgeko/viking-shell/releases) and download the latest release.
 
 Uncompress the zip, install it somewhere in your file system and add viking-shell/bin to your **$PATH.**
+
+Make sure **viking-shell/bin/viking-shell** has execution permissions.
 
 You should also add this to your ~/.profile (or any other profile file you have) to make gradle build faster:
 `export GRADLE_OPTS="-Xmx768m -Dorg.gradle.daemon=true"`
