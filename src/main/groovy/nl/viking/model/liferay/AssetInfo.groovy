@@ -72,13 +72,14 @@ class AssetInfo {
 	def fill(DataHelper h) {
 		if (h) {
 			if (h.user) {
-				userId = h.user.userId
+				userId = userId ?: h.user.userId
 			}
-			groupId = h.themeDisplay.scopeGroupId
+			groupId = groupId ?: h.themeDisplay.scopeGroupId
 		}
 	}
 
 	def register() {
+		fill(Controller.currentDataHelper)
 		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
 	}
 

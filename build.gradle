@@ -7,7 +7,7 @@ apply plugin: 'sonar-runner'
 
 def groupId = 'org.vikingportlets'
 def artifactId = project.name
-def versionNumber = '0.2.29'
+def versionNumber = '0.2.30'
 
 group = groupId
 version = versionNumber
@@ -35,7 +35,7 @@ configurations {
 
 idea {
 	module {
-		scopes.PROVIDED.plus += configurations.providedCompile
+		scopes.PROVIDED.plus += [configurations.providedCompile]
 	}
 }
 

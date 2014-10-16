@@ -8,6 +8,7 @@ import nl.viking.controllers.annotation.Resource
 import nl.viking.db.HibernateFactory
 import nl.viking.enhancers.ModelEnhancer
 import nl.viking.logging.Logger
+import nl.viking.utils.ModelResourcesUtils
 import nl.viking.utils.RenderUtils
 import nl.viking.utils.TemplateUtils
 import org.reflections.Reflections
@@ -49,7 +50,11 @@ class VikingPortlet extends GenericPortlet
 				return false
 			}.name
 		}
+
 		ModelEnhancer.enhanceAllModels()
+
+		ModelResourcesUtils.registerAllModels(portletContext)
+
 		isDevEnabled = Conf.properties.dev.enabled
 		if (isDevEnabled) {
 			Logger.info("Running viking on DEV mode!")

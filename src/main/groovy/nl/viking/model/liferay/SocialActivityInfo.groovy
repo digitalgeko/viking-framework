@@ -2,6 +2,7 @@ package nl.viking.model.liferay
 
 import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil
+import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
 import nl.viking.model.hibernate.Model
 
@@ -29,7 +30,7 @@ class SocialActivityInfo {
 	long receiverUserId
 
 	SocialActivityInfo() {
-
+		fill(Controller.currentDataHelper)
 	}
 
 	SocialActivityInfo(Model model) {
@@ -38,14 +39,20 @@ class SocialActivityInfo {
 		if (model.id) {
 			this.classPK = model.id
 		}
+		fill(Controller.currentDataHelper)
 	}
 
 	def fill(DataHelper h) {
-		userId = h.user.userId
-		groupId = h.themeDisplay.scopeGroupId
+		if (h) {
+			if (h.user) {
+				userId = userId ?: h.user.userId
+			}
+			groupId = groupId ?: h.themeDisplay.scopeGroupId
+		}
 	}
 
 	def register() {
+		fill(Controller.currentDataHelper)
 		SocialActivityLocalServiceUtil.addActivity(userId, groupId, createDate, className, classPK, type, extraData, receiverUserId)
 	}
 

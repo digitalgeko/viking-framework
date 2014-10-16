@@ -1,15 +1,19 @@
 package nl.viking.db
 
 import com.liferay.portal.kernel.util.PropsUtil
+import com.liferay.portal.security.permission.PermissionThreadLocal
+import com.liferay.portal.util.PortalUtil
 import groovy.transform.Synchronized
 import nl.viking.Conf
 import nl.viking.VikingPortlet
 import nl.viking.db.hibernate.strategy.VikingNamingStrategy
 import nl.viking.logging.Logger
+import org.hibernate.EmptyInterceptor
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
+import org.hibernate.type.Type
 import org.reflections.Reflections
 
 import javax.persistence.Entity
@@ -28,6 +32,28 @@ class HibernateFactory {
 	public static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal();
 
 	static final Configuration cfg = new Configuration();
+
+	static final org.hibernate.Interceptor interceptor = new EmptyInterceptor() {
+		@Override
+		boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+//			println "Saving serid:$id"
+			return super.onSave(entity, id, state, propertyNames, types)
+		}
+
+
+		@Override
+		void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+//			println "Deleting serid:$id"
+			super.onDelete(entity, id, state, propertyNames, types)
+		}
+
+		@Override
+		boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState, String[] propertyNames, Type[] types) {
+//			println "Updating serid:$id"
+			return super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types)
+		}
+
+	}
 
 	synchronized static SessionFactory getSessionFactory() {
 		if (sessionFactory == null) {
@@ -75,7 +101,7 @@ class HibernateFactory {
 		if (session) {
 			return session;
 		} else {
-			session = HibernateFactory.sessionFactory.openSession()
+			session = HibernateFactory.sessionFactory.openSession(interceptor)
 			sessionThreadLocal.set(session)
 			return session
 		}

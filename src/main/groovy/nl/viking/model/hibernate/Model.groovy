@@ -36,12 +36,14 @@ class Model extends GenericModel implements Comparable<Model>{
 	Model save() {
 		def obj = super.save()
 		if (this.class.isAnnotationPresent(Asset)) {
-			this.assetInfo.classPK = this.id
-			this.assetInfo.register()
+			def assetInfo = getAssetInfo()
+			assetInfo.classPK = this.id
+			assetInfo.register()
 		}
 		if (this.class.isAnnotationPresent(SocialActivity)) {
-			this.socialActivityInfo.classPK = this.id
-			this.socialActivityInfo.register()
+			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.classPK = this.id
+			socialActivityInfo.register()
 		}
 		return obj;
 	}
