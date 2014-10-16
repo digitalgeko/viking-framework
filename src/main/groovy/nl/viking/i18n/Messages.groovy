@@ -16,26 +16,20 @@ import javax.portlet.PortletConfig
  */
 class Messages {
 
-	ResourceBundle resourceBundle
+	Locale locale
 
-	PortletConfig portletConfig
-
-	Messages(PortletConfig portletConfig, Locale locale) {
-		this.portletConfig = portletConfig
-		this.resourceBundle = portletConfig.getResourceBundle(locale)
+	Messages(Locale locale) {
+		this.locale = locale
 	}
 
 	def get(String key) {
 		try {
 			def result = null
 			if (MorphiaFactory.hasMongo()) {
-				result = VikingMessageEntry.get(key, "")?.value ?: VikingMessageEntry.get(key, Locale.default.toString())?.value
-			}
-			if (!result && resourceBundle.containsKey(key)) {
-				result = resourceBundle.getString(key)
+				result = VikingMessageEntry.get(key, "")?.value ?: VikingMessageEntry.get(key, locale.toString())?.value
 			}
 			if (!result) {
-				result = LanguageUtil.get(Locale.default, key, key)
+				result = LanguageUtil.get(locale, key, key)
 			}
 			if (result) {
 				return result
@@ -51,10 +45,7 @@ class Messages {
 	def get(String key, Locale locale) {
 		try {
 			def result = VikingMessageEntry.get(key, locale.toString())?.value
-			def localeResourceBundle = portletConfig.getResourceBundle(locale)
-			if (!result && localeResourceBundle.containsKey(key)) {
-				result = localeResourceBundle.getString(key)
-			}
+
 			if (!result) {
 				result = LanguageUtil.get(locale, key, key)
 			}
@@ -69,11 +60,11 @@ class Messages {
 	}
 
 	Boolean has(String key) {
-		VikingMessageEntry.get(key, "")?.value || VikingMessageEntry.get(key, Locale.default.toString())?.value || resourceBundle.containsKey(key) || LanguageUtil.get(Locale.default, key, "") != ""
+		VikingMessageEntry.get(key, "")?.value || VikingMessageEntry.get(key, locale.toString())?.value || LanguageUtil.get(locale, key, "") != ""
 	}
 
 	Boolean has(String key, Locale locale) {
-		VikingMessageEntry.get(key, locale.toString())?.value || portletConfig.getResourceBundle(locale).containsKey(key) || LanguageUtil.get(locale, key, "") != ""
+		VikingMessageEntry.get(key, locale.toString())?.value || LanguageUtil.get(locale, key, "") != ""
 	}
 
 	def get(String key, String... args) {

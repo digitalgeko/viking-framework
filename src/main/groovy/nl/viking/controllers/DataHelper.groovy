@@ -57,7 +57,7 @@ class DataHelper {
 
 	Messages getMessages() {
 		if (!messages) {
-			messages = new Messages(getPortletConfig(), getLocale())
+			messages = new Messages(getLocale())
 		}
 		return messages
 	}
