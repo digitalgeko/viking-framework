@@ -8,9 +8,12 @@ import nl.viking.controllers.annotation.Resource
 import nl.viking.db.HibernateFactory
 import nl.viking.enhancers.ModelEnhancer
 import nl.viking.logging.Logger
+import nl.viking.utils.AssetRendererFactoryUtils
+import nl.viking.utils.IndexerUtils
 import nl.viking.utils.ModelResourcesUtils
 import nl.viking.utils.RenderUtils
 import nl.viking.utils.TemplateUtils
+import nl.viking.utils.WorkflowUtils
 import org.reflections.Reflections
 
 import javax.annotation.PostConstruct
@@ -55,6 +58,12 @@ class VikingPortlet extends GenericPortlet
 
 		ModelResourcesUtils.registerAllModels(portletContext)
 
+		IndexerUtils.registerAllModelIndexers()
+
+		AssetRendererFactoryUtils.registerAllFactories()
+
+		WorkflowUtils.registerHandlers()
+
 		isDevEnabled = Conf.properties.dev.enabled
 		if (isDevEnabled) {
 			Logger.info("Running viking on DEV mode!")
@@ -74,7 +83,6 @@ class VikingPortlet extends GenericPortlet
 		cl.setResourceLoader(new GroovyResourceLoader() {
 			@Override
 			URL loadGroovySource(String filename) throws MalformedURLException {
-				if (filename.contains("SoapDataSource")) println "getClassCacheEntry $filename"
 				for (it in sources) {
 					def file = new File(it, filename.replace('.', '/') + ".groovy")
 					if (file.exists()) return file.toURI().toURL()

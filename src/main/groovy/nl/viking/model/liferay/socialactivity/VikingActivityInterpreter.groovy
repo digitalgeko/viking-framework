@@ -1,10 +1,12 @@
-package nl.viking.model.liferay
+package nl.viking.model.liferay.socialactivity
 
 import com.liferay.portal.model.User
 import com.liferay.portal.service.UserLocalServiceUtil
 import com.liferay.portal.theme.ThemeDisplay
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter
 import com.liferay.portlet.social.model.SocialActivityFeedEntry
+import nl.viking.model.annotation.SocialActivity
+import nl.viking.utils.TemplateUtils
 import org.reflections.Reflections
 
 import java.text.SimpleDateFormat
@@ -22,20 +24,26 @@ class VikingActivityInterpreter extends BaseSocialActivityInterpreter{
 	String[] getClassNames() {
 		if (VikingActivityInterpreter.getClassLoader().getResource("models") != null){
 			def reflections = new Reflections("models")
-			Set<Class<?>> modelClasses = reflections.getTypesAnnotatedWith(SocialActivity.class);
+			Set<Class<?>> modelClasses = reflections.getTypesAnnotatedWith(SocialActivity.class)
 			return modelClasses.collect{ it.name } as String[]
 		}
-		return new String[0]  //To change body of implemented methods use File | Settings | File Templates.
+		return new String[0]
 	}
 
 	@Override
 	protected SocialActivityFeedEntry doInterpret(com.liferay.portlet.social.model.SocialActivity activity, ThemeDisplay themeDisplay) throws Exception {
 		User user = UserLocalServiceUtil.getUser(activity.userId)
 		String link = "#"
-		String title = "${user.firstName} created a $activity.extraData"
-		String body = formatter.format(activity.createDate)
 
-		return new SocialActivityFeedEntry(link, title, body);
+		def templateData = [
+		        user: user,
+				activity: activity,
+		]
+
+		String title = TemplateUtils.i18nTemplate(themeDisplay.locale, "", templateData) ?: "${user.firstName} created a $activity.extraData"
+		String body = TemplateUtils.i18nTemplate(themeDisplay.locale, "", templateData) ?: formatter.format(activity.createDate)
+
+		return new SocialActivityFeedEntry(link, title, body)
 	}
 
 }

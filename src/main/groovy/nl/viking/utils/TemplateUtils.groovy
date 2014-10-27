@@ -1,8 +1,10 @@
 package nl.viking.utils
 
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil
+import com.liferay.portal.kernel.language.LanguageUtil
 import freemarker.template.Configuration
 import freemarker.template.Template
+import groovy.text.SimpleTemplateEngine
 import nl.viking.Conf
 import nl.viking.VikingPortlet
 import nl.viking.controllers.DataHelper
@@ -23,13 +25,16 @@ class TemplateUtils {
 
 	private static Configuration freemarkerConfigurationSingleton
 
-	static writeToRequest (request, response, outputStream, viewTemplate, data) {
-		def cfg = getFreemarkerConfiguration(request, response);
+	static writeToOutputStream (viewTemplate, outputStream, data) {
+		def cfg = getFreemarkerConfiguration();
 		Template template = cfg.getTemplate(viewTemplate);
 		Writer out = new OutputStreamWriter(outputStream);
-		fillTemplateVariables(request, response, data)
 		template.process(data, out);
 		out.flush();
+	}
+	static writeToRequest (request, response, outputStream, viewTemplate, data) {
+		fillTemplateVariables(request, response, data)
+		writeToOutputStream(viewTemplate, outputStream, data)
 	}
 
 	static fillTemplateVariables(request, response, data) {
@@ -42,7 +47,7 @@ class TemplateUtils {
 		data["request"] = dataHelper.servletRequest
 	}
 
-	static Configuration getFreemarkerConfiguration(request, response) {
+	static Configuration getFreemarkerConfiguration() {
 		if (freemarkerConfigurationSingleton == null) {
 			ServletContext servletContext = VikingPortlet.currentServletContext;
 			freemarkerConfigurationSingleton = new Configuration();
@@ -56,5 +61,14 @@ class TemplateUtils {
 
 		}
 		freemarkerConfigurationSingleton
+	}
+
+	static String i18nTemplate(Locale locale, String i18nKey, data) {
+		def engine = new SimpleTemplateEngine()
+		def titleTemplate = LanguageUtil.get(locale, i18nKey)
+		if (titleTemplate) {
+			return engine.createTemplate(titleTemplate).make(data).toString()
+		}
+		return null
 	}
 }

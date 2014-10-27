@@ -1,4 +1,4 @@
-package nl.viking.model.liferay
+package nl.viking.model.liferay.socialactivity
 
 import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil
@@ -35,8 +35,8 @@ class SocialActivityInfo {
 
 	SocialActivityInfo(Model model) {
 		this.className = model.class.name
-		this.extraData = model.class.simpleName
 		if (model.id) {
+			this.extraData = model.id
 			this.classPK = model.id
 		}
 		fill(Controller.currentDataHelper)

@@ -96,9 +96,9 @@ class HibernateFactory {
 		Session session = getCurrentSession();
 		def returnValue = null
 		try{
-			session.beginTransaction();
+			session.beginTransaction()
 			returnValue = closure(session)
-			session.transaction.commit();
+			session.transaction.commit()
 		} catch (Exception e) {
 			session.transaction.rollback();
 			Logger.error(e, "Hibernate problem")

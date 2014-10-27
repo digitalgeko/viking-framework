@@ -1,4 +1,4 @@
-package nl.viking.model.liferay
+package nl.viking.model.liferay.asset
 
 import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
@@ -30,6 +30,10 @@ class AssetInfo {
 	String[] tagNames = []
 
 	boolean visible = true
+
+	Date createDate = null
+
+	Date modifiedDate = null
 
 	Date startDate = null
 
@@ -63,9 +67,12 @@ class AssetInfo {
 		fill(Controller.currentDataHelper)
 	}
 
-	AssetInfo(Model model) {
+	AssetInfo(model) {
 		this.className = model.class.name
-		this.classPK = model.id
+		if (model.id) {
+			this.classPK = model.id
+			this.classUuid = model.id.toString()
+		}
 		fill(Controller.currentDataHelper)
 	}
 
@@ -80,7 +87,7 @@ class AssetInfo {
 
 	def register() {
 		fill(Controller.currentDataHelper)
-		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
+		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, createDate, modifiedDate, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
 	}
 
 	def delete() {

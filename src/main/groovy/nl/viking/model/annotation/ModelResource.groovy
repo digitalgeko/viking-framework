@@ -17,11 +17,16 @@ import java.lang.annotation.Target
 @Target([ElementType.TYPE])
 public @interface ModelResource {
 
-	String[] portlets() default [];
-	String weight() default "100";
-	String[] supports () default ["ADD_RECORD", "VIEW", "UPDATE", "DELETE"];
-	String[] siteMemberDefaults() default ["VIEW"];
-	String[] guestDefaults() default ["VIEW"];
-	String[] guestUnsupported () default [];
+	String[] portlets() default []
+
+	String weight() default "100"
+
+	String[] supports () default ["ADD_RECORD", "VIEW", "UPDATE", "DELETE"]
+
+	String[] siteMemberDefaults() default ["VIEW"]
+
+	String[] guestDefaults() default ["VIEW"]
+
+	String[] guestUnsupported () default []
 
 }
