@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.search.SearchEngineUtil
 import com.liferay.portal.kernel.search.Summary
 import com.liferay.portal.util.PortalUtil
 import groovy.text.SimpleTemplateEngine
+import nl.viking.logging.Logger
 import nl.viking.model.annotation.SearchableField
 import nl.viking.utils.TemplateUtils
 
@@ -24,10 +25,6 @@ import javax.portlet.PortletURL
 
 class VikingModelIndexer extends BaseIndexer {
 
-	String titleKey
-
-	String descriptionKey
-
 	Class modelClass
 
 	Long companyId = PortalUtil.defaultCompanyId
@@ -40,9 +37,7 @@ class VikingModelIndexer extends BaseIndexer {
 
 	public static final MODEL_ID = "modelId"
 
-	VikingModelIndexer(String titleKey, String descriptionKey, Class modelClass, String portletId, List searchableFields) {
-		this.titleKey = titleKey
-		this.descriptionKey = descriptionKey
+	VikingModelIndexer(Class modelClass, String portletId, List searchableFields) {
 		this.modelClass = modelClass
 		this.portletId = portletId
 		this.searchableFields = searchableFields
@@ -81,7 +76,13 @@ class VikingModelIndexer extends BaseIndexer {
 			if (type.equalsIgnoreCase("keyword") && fieldType.isAssignableFrom(String.class)) {
 				document.addKeyword(it.name, o[it.propName].toString().toLowerCase())
 			} else {
-				document."add${type.capitalize()}"(it.name, o[it.propName])
+				try {
+					document."add${type.capitalize()}"(it.name, o[it.propName])
+				} catch (e) {
+					Logger.error("Field $it.propName could not be set using document.add${type.capitalize()}(${it.name}, ${o[it.propName]})")
+					throw e
+				}
+
 			}
 		}
 
@@ -104,8 +105,9 @@ class VikingModelIndexer extends BaseIndexer {
 				record: record
 		]
 
-		def title = TemplateUtils.i18nTemplate(locale, titleKey, templateData) ?: "${modelClass.simpleName}[$modelId]"
-		def description = TemplateUtils.i18nTemplate(locale, descriptionKey, templateData) ?: document.toString()
+
+		def title = TemplateUtils.i18nTemplate(locale, "model.resource.${modelClass.name}.title", templateData) ?: "${modelClass.simpleName}[$modelId]"
+		def description = TemplateUtils.i18nTemplate(locale, "model.resource.${modelClass.name}.description", templateData) ?: document.toString()
 
 		return new Summary(title, description, portletURL)
 	}

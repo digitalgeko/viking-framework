@@ -58,12 +58,14 @@ class Model implements Comparable<Model> {
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
 			assetInfo.classPK = _id.inc
+			assetInfo.classUuid = _id.toString()
 			assetInfo.register()
 		}
 
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
 			socialActivityInfo.classPK = _id.inc
+			socialActivityInfo.extraData = _id.toString()
 			socialActivityInfo.register()
 		}
 
@@ -89,6 +91,7 @@ class Model implements Comparable<Model> {
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
 			socialActivityInfo.classPK = _id.inc
+			socialActivityInfo.extraData = _id.toString()
 			socialActivityInfo.delete()
 		}
 

@@ -42,6 +42,15 @@ class SocialActivityInfo {
 		fill(Controller.currentDataHelper)
 	}
 
+	SocialActivityInfo(nl.viking.model.morphia.Model model) {
+		this.className = model.class.name
+		if (model.id) {
+			this.extraData = model.id
+			this.classPK = model._id.inc
+		}
+		fill(Controller.currentDataHelper)
+	}
+
 	def fill(DataHelper h) {
 		if (h) {
 			if (h.user) {

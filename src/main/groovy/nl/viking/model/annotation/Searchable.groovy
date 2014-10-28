@@ -17,8 +17,4 @@ public @interface Searchable {
 
 	String portletId()
 
-	String titleKey() default ""
-
-	String descriptionKey() default ""
-
 }

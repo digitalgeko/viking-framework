@@ -34,14 +34,15 @@ class VikingActivityInterpreter extends BaseSocialActivityInterpreter{
 	protected SocialActivityFeedEntry doInterpret(com.liferay.portlet.social.model.SocialActivity activity, ThemeDisplay themeDisplay) throws Exception {
 		User user = UserLocalServiceUtil.getUser(activity.userId)
 		String link = "#"
-
+		def record = Class.forName(activity.className).findById(activity.extraData)
 		def templateData = [
 		        user: user,
 				activity: activity,
+				record: record
 		]
 
-		String title = TemplateUtils.i18nTemplate(themeDisplay.locale, "", templateData) ?: "${user.firstName} created a $activity.extraData"
-		String body = TemplateUtils.i18nTemplate(themeDisplay.locale, "", templateData) ?: formatter.format(activity.createDate)
+		String title = TemplateUtils.i18nTemplate(themeDisplay.locale, "model.resource.${activity.className}.title", templateData) ?: "${user.firstName} created a $activity.extraData"
+		String body = TemplateUtils.i18nTemplate(themeDisplay.locale, "model.resource.${activity.className}.description", templateData) ?: formatter.format(activity.createDate)
 
 		return new SocialActivityFeedEntry(link, title, body)
 	}

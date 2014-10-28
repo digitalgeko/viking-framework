@@ -1,7 +1,11 @@
 package nl.viking.model.liferay.asset
 
 import com.liferay.portal.kernel.util.StringPool
+import com.liferay.portlet.asset.service.AssetEntryLocalService
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
+import com.liferay.portlet.asset.service.AssetEntryService
+import com.liferay.portlet.asset.service.AssetEntryServiceUtil
+import com.sun.org.apache.xpath.internal.operations.Mod
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
 import nl.viking.model.hibernate.Model
@@ -67,11 +71,20 @@ class AssetInfo {
 		fill(Controller.currentDataHelper)
 	}
 
-	AssetInfo(model) {
+	AssetInfo(Model model) {
 		this.className = model.class.name
 		if (model.id) {
 			this.classPK = model.id
 			this.classUuid = model.id.toString()
+		}
+		fill(Controller.currentDataHelper)
+	}
+
+	AssetInfo(nl.viking.model.morphia.Model model) {
+		this.className = model.class.name
+		if (model.id) {
+			this.classPK = model._id.inc
+			this.classUuid = model.id
 		}
 		fill(Controller.currentDataHelper)
 	}
@@ -87,6 +100,7 @@ class AssetInfo {
 
 	def register() {
 		fill(Controller.currentDataHelper)
+		println "clasuuid:$classUuid"
 		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, createDate, modifiedDate, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
 	}
 

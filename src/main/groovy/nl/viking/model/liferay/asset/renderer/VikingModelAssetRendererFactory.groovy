@@ -39,34 +39,19 @@ class VikingModelAssetRendererFactory extends BaseAssetRendererFactory {
 	@Override
 	AssetRenderer getAssetRenderer(long classPK, int type) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
 		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
-		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass)
+		def record = modelClass.findById(assetEntry.classUuid)
+		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass, record: record)
 	}
 
-	@Override
-	AssetRenderer getAssetRenderer(long groupId, String urlTitle) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		return super.getAssetRenderer(groupId, urlTitle)
-	}
-	@Override
-	AssetRenderer getAssetRenderer(long classPK) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
-		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass)
-	}
-
-	@Override
-	AssetEntry getAssetEntry(long assetEntryId) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		return super.getAssetEntry(assetEntryId)
-	}
-
-	@Override
-	AssetEntry getAssetEntry(String className, long classPK) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		return super.getAssetEntry(className, classPK)
-	}
-
-
-	@Override
-	String getPortletId() {
-		return assetRendererAnnotation.portletId()
-	}
+//	@Override
+//	AssetRenderer getAssetRenderer(long groupId, String urlTitle) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
+//		return super.getAssetRenderer(groupId, urlTitle)
+//	}
+//	@Override
+//	AssetRenderer getAssetRenderer(long classPK) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
+//		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
+//		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass)
+//	}
 
 	@Override
 	String getType() {
@@ -74,43 +59,13 @@ class VikingModelAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	boolean hasPermission(PermissionChecker permissionChecker, long classPK, String actionId) throws Exception {
-		true
-	}
-	@Override
-	public boolean isLinkable() {
-		return true;
-	}
-
-	@Override
-	PortletURL getURLAdd(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(PortletRequest.RENDER_PHASE);
-		return portletURL;
-	}
-
-
-	@Override
-	boolean isSelectable() {
-		return true
-	}
-
-	@Override
-	boolean isCategorizable() {
-		return true
-	}
-
-	@Override
-	public PortletURL getURLView(
-			LiferayPortletResponse liferayPortletResponse,
-			WindowState windowState) {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(PortletRequest.RENDER_PHASE);
-		return portletURL;
-	}
-
-	@Override
 	long getClassNameId() {
 		return PortalUtil.getClassNameId(className)
 	}
 
+	@Override
+	String getPortletId() {
+		return assetRendererAnnotation.portletId()
+	}
 
 }

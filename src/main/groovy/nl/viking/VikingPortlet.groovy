@@ -54,6 +54,8 @@ class VikingPortlet extends GenericPortlet
 			}.name
 		}
 
+		HibernateFactory.getSessionFactory()
+
 		ModelEnhancer.enhanceAllModels()
 
 		ModelResourcesUtils.registerAllModels(portletContext)

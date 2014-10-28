@@ -58,6 +58,19 @@ If you use Mac OS, Ubuntu or Debian: Viking shell will automatically download th
 * Coffeescript ([http://coffeescript.org/](http://coffeescript.org/))
 * MongoDB ([http://www.mongodb.org/](http://www.mongodb.org/))
 
+#### Additional notes
+##### MySQL
+If you are running Mac OS, and you installed mysql via viking-shell (brew), you may want to start mysql server by executing:
+
+```
+launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mysql.plist
+```
+
+To start mysql server at login:
+
+```
+ln -sfv /usr/local/opt/mysql/*.plist ~/Library/LaunchAgents
+```
 
 ## Installation
 

@@ -44,8 +44,6 @@ class IndexerUtils {
 			}.findAll { it != null }
 
 			def modelIndexer = new VikingModelIndexer(
-					searchableAnnotation.titleKey(),
-					searchableAnnotation.descriptionKey(),
 					modelClass,
 					searchableAnnotation.portletId(),
 					searchableFields

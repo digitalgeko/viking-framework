@@ -32,6 +32,8 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 
 	Class modelClass
 
+	def record
+
 	@Override
 	String getClassName() {
 		return modelClass.name
@@ -49,13 +51,12 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 
 	@Override
 	String getSummary(Locale locale) {
-		return "summary of my model"
-//		return assetEntry.summary
+		TemplateUtils.i18nTemplate(locale, "model.resource.${modelClass.name}.description", [record:record])
 	}
 
 	@Override
 	String getTitle(Locale locale) {
-		return assetEntry.title
+		TemplateUtils.i18nTemplate(locale, "model.resource.${modelClass.name}.title", [record:record])
 	}
 
 	@Override
@@ -73,15 +74,11 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 		return assetEntry.classUuid
 	}
 
-
-
 	@Override
 	String render(RenderRequest renderRequest, RenderResponse renderResponse, String template) throws Exception {
 		try {
 			if (template.equals(TEMPLATE_ABSTRACT) ||
 					template.equals(TEMPLATE_FULL_CONTENT)) {
-
-				def record = modelClass.findById(assetEntry.classUuid)
 
 				def data = [
 						record: record
@@ -98,55 +95,6 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 			Logger.error(e, "Asset renderer template for $modelClass not found")
 		}
 		return null
-	}
-
-	@Override
-	boolean hasViewPermission(PermissionChecker permissionChecker) throws PortalException, SystemException {
-		true
-	}
-
-	@Override
-	public boolean hasEditPermission(PermissionChecker permissionChecker)
-			throws PortalException, SystemException {
-
-		return true;
-	}
-
-
-	@Override
-	boolean isPrintable() {
-		true
-	}
-
-	@Override
-	boolean isDisplayable() {
-		true
-	}
-
-
-	@Override
-	String getUrlTitle() {
-		return "my-url-title"
-	}
-
-	@Override
-	PortletURL getURLView(LiferayPortletResponse liferayPortletResponse, WindowState windowState) throws Exception {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(PortletRequest.RENDER_PHASE);
-		return portletURL;
-	}
-
-	@Override
-	String getURLViewInContext(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse, String noSuchEntryRedirect) throws Exception {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(PortletRequest.RENDER_PHASE);
-		return portletURL;
-	}
-
-
-	@Override
-	PortletURL getURLEdit(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse)
-			throws Exception {
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(PortletRequest.RENDER_PHASE);
-		return portletURL;
 	}
 
 

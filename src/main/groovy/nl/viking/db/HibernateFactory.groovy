@@ -114,6 +114,7 @@ class HibernateFactory {
 
 	static void destroy() {
 		if (sessionFactory != null) {
+			closeCurrentSession()
 			sessionFactory.close()
 			sessionFactory = null
 		}
