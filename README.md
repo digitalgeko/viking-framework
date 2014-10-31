@@ -676,6 +676,7 @@ Variables available in **h** are:
 |h.user|com.liferay.portal.model.User|
 |h.portletId|java.lang.String|
 |h.session|javax.portlet.PortletSession|
+|h.contextPath|java.lang.String|
 
 **h** is available in templates as well.
 
