@@ -100,7 +100,6 @@ class AssetInfo {
 
 	def register() {
 		fill(Controller.currentDataHelper)
-		println "clasuuid:$classUuid"
 		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, createDate, modifiedDate, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
 	}
 

@@ -37,7 +37,7 @@ class VikingModelWorkflowHandler extends BaseWorkflowHandler {
 
 	@Override
 	String getTitle(long classPK, Locale locale) {
-		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
+		def assetEntry = AssetEntryLocalServiceUtil.getEntry(modelClass.name, classPK)
 		if (assetEntry && workflowAnnotation.title()) {
 			def record = modelClass.findById(assetEntry.classUuid)
 			def data = [

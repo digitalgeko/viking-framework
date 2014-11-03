@@ -2,6 +2,7 @@ package nl.viking.model.liferay.socialactivity
 
 import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil
+import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
 import nl.viking.model.hibernate.Model
@@ -33,24 +34,6 @@ class SocialActivityInfo {
 		fill(Controller.currentDataHelper)
 	}
 
-	SocialActivityInfo(Model model) {
-		this.className = model.class.name
-		if (model.id) {
-			this.extraData = model.id
-			this.classPK = model.id
-		}
-		fill(Controller.currentDataHelper)
-	}
-
-	SocialActivityInfo(nl.viking.model.morphia.Model model) {
-		this.className = model.class.name
-		if (model.id) {
-			this.extraData = model.id
-			this.classPK = model._id.inc
-		}
-		fill(Controller.currentDataHelper)
-	}
-
 	def fill(DataHelper h) {
 		if (h) {
 			if (h.user) {
@@ -66,7 +49,7 @@ class SocialActivityInfo {
 	}
 
 	def delete() {
-		SocialActivityLocalServiceUtil.deleteActivities(className, classPK)
+		// SocialActivityLocalServiceUtil.deleteActivities(className, classPK)
 	}
 
 }

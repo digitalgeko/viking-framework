@@ -164,7 +164,7 @@ class Bind {
 		nl.viking.model.morphia.Model.class.isAssignableFrom(clazz) || nl.viking.model.hibernate.Model.class.isAssignableFrom(clazz)
 	}
 
-	def <T> T fromJsonBody(Class<T> clazz) {
+	def <T> T fromJsonBody(Class<T> clazz = Object.class) {
 		InputStream inputStream
 		if (request.hasProperty("inputStream")) {
 			inputStream = request.inputStream

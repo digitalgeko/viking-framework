@@ -8,6 +8,7 @@ import nl.viking.Conf
 import nl.viking.VikingPortlet
 import nl.viking.db.hibernate.strategy.VikingNamingStrategy
 import nl.viking.logging.Logger
+import nl.viking.utils.ReflectionUtils
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
@@ -58,14 +59,11 @@ class HibernateFactory {
 			def additionalModelPackages = Conf.properties.models.additionalPackages ?: []
 			def modelPackages = ['models'] + additionalModelPackages
 
-			modelPackages.each {
-				def reflections = new Reflections(it)
-				Set<Class<?>> modelClasses = reflections.getTypesAnnotatedWith(Entity.class) + reflections.getTypesAnnotatedWith(org.hibernate.annotations.Entity.class);
-				modelClasses.each{ type ->
-					cfg.addAnnotatedClass(type);
-				}
+			def modelClasses = ReflectionUtils.getModelClassesWithAnnotations(modelPackages, Entity.class, org.hibernate.annotations.Entity.class)
+			modelClasses.each { type ->
+				cfg.addAnnotatedClass(type);
 			}
-//			cfg.addAnnotatedClass(VikingMessageEntry.class);
+
 			sessionFactory = cfg.buildSessionFactory();
 		}
 

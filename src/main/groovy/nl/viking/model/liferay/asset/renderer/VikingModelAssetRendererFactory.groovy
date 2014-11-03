@@ -3,17 +3,21 @@ package nl.viking.model.liferay.asset.renderer
 import com.liferay.portal.kernel.exception.PortalException
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse
-import com.liferay.portal.security.permission.PermissionChecker
+import com.liferay.portal.kernel.portlet.LiferayWindowState
+import com.liferay.portal.kernel.util.WebKeys
+import com.liferay.portal.security.permission.ActionKeys
+import com.liferay.portal.theme.ThemeDisplay
 import com.liferay.portal.util.PortalUtil
-import com.liferay.portlet.asset.model.AssetEntry
+import com.liferay.portlet.PortletURLFactoryUtil
 import com.liferay.portlet.asset.model.AssetRenderer
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
-import org.omg.CORBA.SystemException
+import nl.viking.logging.Logger
+import nl.viking.model.annotation.Asset
 
 import javax.portlet.PortletRequest
 import javax.portlet.PortletURL
-import javax.portlet.WindowState
+import javax.portlet.WindowStateException
 
 /**
  * User: mardo
@@ -24,11 +28,11 @@ class VikingModelAssetRendererFactory extends BaseAssetRendererFactory {
 
 	Class modelClass
 
-	nl.viking.model.annotation.AssetRenderer assetRendererAnnotation
+	Asset assetAnnotation
 
-	VikingModelAssetRendererFactory(Class modelClass, nl.viking.model.annotation.AssetRenderer assetRendererAnnotation) {
+	VikingModelAssetRendererFactory(Class modelClass, Asset assetAnnotation) {
 		this.modelClass = modelClass
-		this.assetRendererAnnotation = assetRendererAnnotation
+		this.assetAnnotation = assetAnnotation
 	}
 
 	@Override
@@ -38,24 +42,14 @@ class VikingModelAssetRendererFactory extends BaseAssetRendererFactory {
 
 	@Override
 	AssetRenderer getAssetRenderer(long classPK, int type) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
+		def assetEntry = AssetEntryLocalServiceUtil.getEntry(modelClass.name, classPK)
 		def record = modelClass.findById(assetEntry.classUuid)
-		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass, record: record)
+		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetAnnotation: assetAnnotation, modelClass: modelClass, record: record)
 	}
-
-//	@Override
-//	AssetRenderer getAssetRenderer(long groupId, String urlTitle) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-//		return super.getAssetRenderer(groupId, urlTitle)
-//	}
-//	@Override
-//	AssetRenderer getAssetRenderer(long classPK) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-//		def assetEntry = AssetEntryLocalServiceUtil.fetchEntry(modelClass.name, classPK)
-//		return new VikingModelAssetRenderer(assetEntry: assetEntry, assetRendererAnnotation: assetRendererAnnotation, modelClass: modelClass)
-//	}
 
 	@Override
 	String getType() {
-		return assetRendererAnnotation.type()
+		return modelClass.name
 	}
 
 	@Override
@@ -65,7 +59,27 @@ class VikingModelAssetRendererFactory extends BaseAssetRendererFactory {
 
 	@Override
 	String getPortletId() {
-		return assetRendererAnnotation.portletId()
+		return assetAnnotation.portletId()
 	}
 
+	@Override
+	PortletURL getURLAdd(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
+		def addNewPortletId = assetAnnotation.addNewPortletId()
+		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		if (addNewPortletId && themeDisplay.permissionChecker.hasPermission(themeDisplay.scopeGroupId, modelClass.name, null, ActionKeys.ADD_RECORD)) {
+			def url = PortletURLFactoryUtil.create(liferayPortletRequest, addNewPortletId, themeDisplay.plid, PortletRequest.RENDER_PHASE);
+			try {
+				url.setWindowState(LiferayWindowState.MAXIMIZED);
+			} catch (WindowStateException wse) {
+				Logger.error(wse, "setWindowState problem")
+			}
+
+			url.setParameter("className", modelClass.name)
+
+			return url
+		}
+
+		return null
+	}
 }

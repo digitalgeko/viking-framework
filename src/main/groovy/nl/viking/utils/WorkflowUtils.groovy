@@ -26,9 +26,7 @@ import java.lang.reflect.Method
 class WorkflowUtils {
 
 	static registerHandlers() {
-		def reflections = new Reflections("models")
-
-		reflections.getTypesAnnotatedWith(Workflow.class).each { modelClass ->
+		ReflectionUtils.getModelClassesWithAnnotations(Workflow.class).each { modelClass ->
 			Workflow workflowAnnotation = modelClass.annotations.find {it instanceof Workflow}
 
 			WorkflowHandlerRegistryUtil.register(new VikingModelWorkflowHandler(modelClass, workflowAnnotation))

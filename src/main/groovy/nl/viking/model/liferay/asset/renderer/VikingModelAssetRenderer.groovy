@@ -1,16 +1,16 @@
 package nl.viking.model.liferay.asset.renderer
 
-import com.liferay.portal.kernel.exception.PortalException
-import com.liferay.portal.kernel.exception.SystemException
+import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse
-import com.liferay.portal.security.permission.PermissionChecker
-import com.liferay.portal.util.PortletKeys
-import com.liferay.portal.util.WebKeys
+import com.liferay.portal.kernel.portlet.LiferayWindowState
+import com.liferay.portal.kernel.util.WebKeys
+import com.liferay.portal.theme.ThemeDisplay
+import com.liferay.portlet.PortletURLFactoryUtil
 import com.liferay.portlet.asset.model.AssetEntry
 import com.liferay.portlet.asset.model.BaseAssetRenderer
 import nl.viking.logging.Logger
-import nl.viking.model.annotation.AssetRenderer
+import nl.viking.model.annotation.Asset
 import nl.viking.utils.TemplateUtils
 
 import javax.portlet.PortletRequest
@@ -18,6 +18,7 @@ import javax.portlet.PortletURL
 import javax.portlet.RenderRequest
 import javax.portlet.RenderResponse
 import javax.portlet.WindowState
+import javax.portlet.WindowStateException
 
 /**
  * User: mardo
@@ -28,7 +29,7 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 
 	AssetEntry assetEntry
 
-	AssetRenderer assetRendererAnnotation
+	Asset assetAnnotation
 
 	Class modelClass
 
@@ -81,12 +82,13 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 					template.equals(TEMPLATE_FULL_CONTENT)) {
 
 				def data = [
-						record: record
+						record: record,
+						template: template
 				]
 
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-				TemplateUtils.writeToOutputStream(assetRendererAnnotation.template(), outputStream, data)
-				renderRequest.setAttribute("output", new String(outputStream.toByteArray()))
+				TemplateUtils.writeToOutputStream(assetAnnotation.template(), outputStream, data)
+				renderRequest.setAttribute("viking_model_render_output", new String(outputStream.toByteArray()))
 				return "/html/viking/asset_renderer_output.jsp"
 			} else {
 				return null;
@@ -97,5 +99,27 @@ class VikingModelAssetRenderer extends BaseAssetRenderer {
 		return null
 	}
 
+	@Override
+	PortletURL getURLView(LiferayPortletResponse liferayPortletResponse, WindowState windowState) throws Exception {
+		return super.getURLView(liferayPortletResponse, windowState)
+	}
+
+	@Override
+	String getURLViewInContext(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse, String noSuchEntryRedirect) throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		def url = PortletURLFactoryUtil.create(liferayPortletRequest, assetAnnotation.portletId(), themeDisplay.plid, PortletRequest.RENDER_PHASE);
+		try {
+			url.setWindowState(LiferayWindowState.MAXIMIZED);
+		} catch (WindowStateException wse) {
+			Logger.error(wse, "setWindowState problem")
+		}
+
+		url.setParameter("className", modelClass.name)
+		url.setParameter("classPK", record.id.toString())
+
+		return url.toString()
+	}
 
 }

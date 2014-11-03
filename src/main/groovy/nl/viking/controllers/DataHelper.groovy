@@ -8,6 +8,7 @@ import com.liferay.portal.service.ServiceContextFactory
 import com.liferay.portal.theme.ThemeDisplay
 import com.liferay.portal.util.PortalUtil
 import nl.viking.i18n.Messages
+import nl.viking.logging.Logger
 
 import javax.portlet.PortletConfig
 import javax.portlet.PortletSession
@@ -132,4 +133,12 @@ class DataHelper {
     String getContextPath() {
         this.portletRequest.contextPath
     }
+
+	boolean hasPermission(resourceName, actionId, groupId = null, primKey = null) {
+		def themeDisplay = getThemeDisplay()
+		if (!groupId) {
+			groupId = themeDisplay.siteGroupId
+		}
+		themeDisplay.permissionChecker.hasPermission(groupId, resourceName, primKey, actionId)
+	}
 }

@@ -128,6 +128,11 @@ class Controller {
 
     def render(String viewTemplate, LinkedHashMap data = []) {
         if (!viewTemplate) viewTemplate = this.viewTemplate
+
+		if (data.angularData) {
+			data.angularData = toJson(data.angularData)
+		}
+
         if (validator.errors.size() > 0) {
             data << [vikingErrors: validator.errors]
         }
@@ -195,6 +200,10 @@ class Controller {
     def File bindFile (String parameterName, File defaultValue = null) {
         bind(parameterName, File.class, defaultValue)
     }
+
+	def <T> T bindJsonBody (Class<T> clazz = Object.class) {
+		binder.fromJsonBody(clazz)
+	}
 
 
     RenderRequest getRenderRequest() {

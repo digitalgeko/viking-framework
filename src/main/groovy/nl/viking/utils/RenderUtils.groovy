@@ -28,7 +28,6 @@ class RenderUtils {
 			} else if (data instanceof File) {
 				File file = data
 				controllerInstance.renderBinary(file)
-
 			} else if (data == null) {
 				controllerInstance.render((LinkedHashMap) [])
 			} else if (data instanceof Redirect){

@@ -33,14 +33,15 @@ class GenericModel {
 
 	def delete () {
 
-		HibernateFactory.withSession { Session session ->
-			session.delete(this)
-		}
-
 		if (this.class.isAnnotationPresent(Searchable)) {
 			def indexer = IndexerRegistryUtil.getIndexer(this.class)
 			indexer.delete(this)
 		}
+
+		HibernateFactory.withSession { Session session ->
+			session.delete(this)
+		}
+
 	}
 
 	static def query(Closure closure) {

@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil
 import com.liferay.portal.service.ServiceContext
 import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil
 import com.liferay.portal.util.PortalUtil
+import groovy.json.JsonBuilder
 import nl.viking.model.annotation.Asset
 import nl.viking.model.liferay.asset.AssetInfo
 import nl.viking.model.annotation.SocialActivity
@@ -43,9 +44,12 @@ class Model extends GenericModel implements Comparable<Model>{
 	@Override
 	Model save() {
 
+		def crudOperation
 		if (id) {
+			crudOperation = "update"
 			updated = new Date()
 		} else {
+			crudOperation = "create"
 			created = updated = new Date()
 		}
 
@@ -69,18 +73,19 @@ class Model extends GenericModel implements Comparable<Model>{
 
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.className = this.class.name
 			socialActivityInfo.classPK = this.id
+			socialActivityInfo.extraData = new JsonBuilder([classUuid: id.toString(), crudOperation: crudOperation]).toString()
 			socialActivityInfo.register()
 		}
-
 
 		return obj;
 	}
 
 	@Override
 	def delete() {
-		def obj = super.delete()
 
+		def obj = super.delete()
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
 			assetInfo.classPK = this.id
@@ -89,12 +94,13 @@ class Model extends GenericModel implements Comparable<Model>{
 
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.className = this.class.name
 			socialActivityInfo.classPK = this.id
-			socialActivityInfo.delete()
+			socialActivityInfo.extraData = new JsonBuilder([classUuid: id.toString(), crudOperation: "delete"]).toString()
+			socialActivityInfo.register()
 		}
 
-
-		return obj;
+		obj
 	}
 
 	@Override
@@ -121,7 +127,7 @@ class Model extends GenericModel implements Comparable<Model>{
 
 	SocialActivityInfo getSocialActivityInfo() {
 		if (!socialActivityInfo) {
-			socialActivityInfo = new SocialActivityInfo(this)
+			socialActivityInfo = new SocialActivityInfo()
 		}
 		return socialActivityInfo
 	}

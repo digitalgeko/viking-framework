@@ -5,6 +5,7 @@ import com.google.code.morphia.annotations.Id
 import com.google.code.morphia.annotations.Transient
 import com.google.code.morphia.query.Query
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
+import groovy.json.JsonBuilder
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.Asset
@@ -47,9 +48,12 @@ class Model implements Comparable<Model> {
 
     Model save() {
 
+		def crudOperation
 		if (_id) {
+			crudOperation = "update"
 			_updated = new Date().getTime()
 		} else {
+			crudOperation = "create"
 			_created = _updated = new Date().getTime()
 		}
 
@@ -64,8 +68,9 @@ class Model implements Comparable<Model> {
 
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.className = this.class.name
 			socialActivityInfo.classPK = _id.inc
-			socialActivityInfo.extraData = _id.toString()
+			socialActivityInfo.extraData = new JsonBuilder([classUuid: _id.toString(), crudOperation: crudOperation]).toString()
 			socialActivityInfo.register()
 		}
 
@@ -78,21 +83,21 @@ class Model implements Comparable<Model> {
     }
 
     def delete () {
-
 		MorphiaFactory.ds().delete(this)
 
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
 			assetInfo.classPK = _id.inc
-			assetInfo.classUuid = this.id
+			assetInfo.classUuid = _id.toString()
 			assetInfo.delete()
 		}
 
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.className = this.class.name
 			socialActivityInfo.classPK = _id.inc
-			socialActivityInfo.extraData = _id.toString()
-			socialActivityInfo.delete()
+			socialActivityInfo.extraData = new JsonBuilder([classUuid: _id.toString(), crudOperation: "delete"]).toString()
+			socialActivityInfo.register()
 		}
 
 		if (this.class.isAnnotationPresent(Searchable)) {
@@ -151,7 +156,7 @@ class Model implements Comparable<Model> {
 
 	SocialActivityInfo getSocialActivityInfo() {
 		if (!socialActivityInfo) {
-			socialActivityInfo = new SocialActivityInfo(this)
+			socialActivityInfo = new SocialActivityInfo()
 		}
 		return socialActivityInfo
 	}

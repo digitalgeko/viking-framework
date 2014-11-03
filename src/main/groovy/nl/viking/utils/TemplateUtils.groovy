@@ -58,6 +58,9 @@ class TemplateUtils {
 			}
 			freemarkerConfigurationSingleton.addAutoInclude("viking_macros/errors.ftl")
 			freemarkerConfigurationSingleton.addAutoInclude("viking_macros/notifications.ftl")
+			if (freemarkerConfigurationSingleton.getTemplate("viking_macros/header.ftl")) {
+				freemarkerConfigurationSingleton.addAutoInclude("viking_macros/header.ftl")
+			}
 
 		}
 		freemarkerConfigurationSingleton

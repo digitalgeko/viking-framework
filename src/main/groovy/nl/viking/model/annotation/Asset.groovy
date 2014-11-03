@@ -14,5 +14,12 @@ import java.lang.annotation.Target
 @Target([ElementType.TYPE])
 public @interface Asset {
 
+	String portletId()
+
+	String addNewPortletId() default ""
+
+	String template()
+
+	String type() default "viking-model"
 
 }

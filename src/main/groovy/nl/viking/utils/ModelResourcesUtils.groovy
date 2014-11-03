@@ -17,10 +17,9 @@ import javax.portlet.PortletContext
 class ModelResourcesUtils {
 
 	static registerAllModels(PortletContext portletContext) {
-		def reflections = new Reflections("models")
 		def modelResourceTemplate = new SimpleTemplateEngine().createTemplate(ModelResourcesUtils.classLoader.getResource("templates/model-resource-template.xml"))
 
-		reflections.getTypesAnnotatedWith(ModelResource.class).each { modelClass ->
+		ReflectionUtils.getModelClassesWithAnnotations(ModelResource.class).each { modelClass ->
 			ModelResource modelResourceAnnotation = modelClass.annotations.find {it instanceof ModelResource}
 
 			def data = [

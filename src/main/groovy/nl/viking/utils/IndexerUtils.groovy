@@ -1,16 +1,10 @@
 package nl.viking.utils
 
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
-import com.liferay.portal.security.permission.ResourceActionsUtil
-import groovy.text.SimpleTemplateEngine
-import nl.viking.model.annotation.ModelResource
 import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.SearchableField
 import nl.viking.model.indexer.VikingModelIndexer
-import org.reflections.Reflections
 
-import javax.portlet.PortletContext
-import java.lang.reflect.Field
 import java.lang.reflect.Method
 
 /**
@@ -21,9 +15,8 @@ import java.lang.reflect.Method
 class IndexerUtils {
 
 	static registerAllModelIndexers() {
-		def reflections = new Reflections("models")
 
-		reflections.getTypesAnnotatedWith(Searchable.class).each { modelClass ->
+		ReflectionUtils.getModelClassesWithAnnotations(Searchable.class).each { modelClass ->
 			Searchable searchableAnnotation = modelClass.annotations.find {it instanceof Searchable}
 
 			def searchableFields = [modelClass.declaredFields + modelClass.declaredMethods].flatten().collect {

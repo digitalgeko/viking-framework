@@ -8,10 +8,13 @@ import com.liferay.portal.kernel.search.DocumentImpl
 import com.liferay.portal.kernel.search.Field
 import com.liferay.portal.kernel.search.SearchContext
 import com.liferay.portal.kernel.search.SearchEngineUtil
+import com.liferay.portal.kernel.search.SearchException
 import com.liferay.portal.kernel.search.Summary
 import com.liferay.portal.util.PortalUtil
 import groovy.text.SimpleTemplateEngine
 import nl.viking.logging.Logger
+import nl.viking.model.annotation.Asset
+import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.SearchableField
 import nl.viking.utils.TemplateUtils
 
@@ -57,6 +60,13 @@ class VikingModelIndexer extends BaseIndexer {
 		document.addKeyword(Field.ENTRY_CLASS_NAME, modelClass.name)
 		document.addKeyword(Field.PORTLET_ID, portletId)
 		document.addKeyword(Field.COMPANY_ID, companyId)
+
+		Asset assetAnnotation = modelClass.annotations.find {it instanceof Asset}
+		if (assetAnnotation) {
+			document.addKeyword(Field.ENTRY_CLASS_PK, o.assetInfo.classPK)
+			document.addKeyword(Field.GROUP_ID, o.assetInfo.groupId)
+			document.addKeyword(Field.SCOPE_GROUP_ID, o.assetInfo.groupId)
+		}
 
 		searchableFields.each {
 			def type = it.searchableFieldAnnotation.type()
@@ -126,6 +136,23 @@ class VikingModelIndexer extends BaseIndexer {
 	protected void doReindex(String[] strings) throws Exception {
 		// TODO
 	}
+
+	@Override
+	void reindex(Object obj) throws SearchException {
+		super.reindex(obj)
+	}
+
+	@Override
+	void reindex(String className, long classPK) throws SearchException {
+		super.reindex(className, classPK)
+	}
+
+	@Override
+	void reindex(String[] ids) throws SearchException {
+		super.reindex(ids)
+	}
+
+
 
 	@Override
 	protected String getPortletId(SearchContext searchContext) {

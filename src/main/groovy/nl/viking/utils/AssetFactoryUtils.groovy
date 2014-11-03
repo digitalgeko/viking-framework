@@ -26,15 +26,13 @@ import javax.portlet.WindowStateException
  * Date: 10/21/14
  * Time: 10:59 AM
  */
-class AssetRendererFactoryUtils {
+class AssetFactoryUtils {
 
 	static registerAllFactories () {
-		def reflections = new Reflections("models")
+		ReflectionUtils.getModelClassesWithAnnotations(Asset.class).each { modelClass ->
+			Asset assetAnnotation = modelClass.annotations.find {it instanceof Asset}
 
-		reflections.getTypesAnnotatedWith(Asset.class).each { modelClass ->
-			nl.viking.model.annotation.AssetRenderer assetRendererAnnotation = modelClass.annotations.find {it instanceof nl.viking.model.annotation.AssetRenderer}
-
-			AssetRendererFactoryRegistryUtil.register(new VikingModelAssetRendererFactory(modelClass, assetRendererAnnotation))
+			AssetRendererFactoryRegistryUtil.register(new VikingModelAssetRendererFactory(modelClass, assetAnnotation))
 		}
 	}
 }
