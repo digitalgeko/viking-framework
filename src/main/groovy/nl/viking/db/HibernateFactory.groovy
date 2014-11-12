@@ -40,16 +40,16 @@ class HibernateFactory {
 			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
 			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
 
-			cfg.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "org.hibernate.context.ThreadLocalSessionContext")
-			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.jolbox.bonecp.provider.BoneCPConnectionProvider")
+//			cfg.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "org.hibernate.context.ThreadLocalSessionContext")
+//			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.jolbox.bonecp.provider.BoneCPConnectionProvider")
 
 			if (Conf.properties.hibernate.prefix) {
 				cfg.setNamingStrategy(new VikingNamingStrategy())
 			}
 
-			Conf.properties.bonecp.flatten().each {
-				cfg.setProperty("bonecp."+it.key, it.value.toString())
-			}
+//			Conf.properties.bonecp.flatten().each {
+//				cfg.setProperty("bonecp."+it.key, it.value.toString())
+//			}
 
 			Conf.properties.hibernate.flatten().each {
 				cfg.setProperty("hibernate."+it.key, it.value)
