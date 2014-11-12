@@ -1,6 +1,7 @@
 package nl.viking.model.hibernate
 
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
+import nl.viking.controllers.Controller
 import nl.viking.db.HibernateFactory
 import nl.viking.model.annotation.Searchable
 import org.hibernate.Session
@@ -17,7 +18,17 @@ import javax.persistence.MappedSuperclass
 @MappedSuperclass
 class GenericModel {
 
+	Long groupId
+
+	Long companyId
+
 	GenericModel save() {
+
+		def h = Controller.currentDataHelper
+		if (h) {
+			groupId = groupId ?: h.themeDisplay.scopeGroupId
+			companyId = companyId ?: h.themeDisplay.companyId
+		}
 
 		HibernateFactory.withSession { Session session ->
 			session.saveOrUpdate(this)
@@ -53,6 +64,10 @@ class GenericModel {
 	}
 
 	static List findAll() {
+		return null
+	}
+
+	static List findAllInDB() {
 		return null
 	}
 

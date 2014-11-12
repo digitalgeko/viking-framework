@@ -1,6 +1,7 @@
 package nl.viking.enhancers
 
 import com.google.code.morphia.query.Query
+import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.morphia.Model
 import org.bson.types.ObjectId
@@ -14,13 +15,25 @@ import org.bson.types.ObjectId
  */
 class MorphiaModelEnhancer {
 
+
+	private static addDefaultFilters(Query query) {
+		def h = Controller.currentDataHelper
+		if (h) {
+			query.filter("groupId", h.themeDisplay.scopeGroupId)
+			query.filter("companyId", h.themeDisplay.companyId)
+		}
+		query
+	}
+
     static enhance(Class<? extends Model> type) {
         type.metaClass.'static'.find = {
-            MorphiaFactory.ds().find(type)
+            def query = MorphiaFactory.ds().find(type)
+			addDefaultFilters(query)
         }
 
         type.metaClass.'static'.find = { String keys, Object[] values ->
             Query query = type.find()
+			addDefaultFilters(query)
             keys.split(",").eachWithIndex { key, i ->
                 query.filter(key, values[i])
             }
@@ -28,8 +41,14 @@ class MorphiaModelEnhancer {
         }
 
         type.metaClass.'static'.findAll = {
-            type.find().asList()
+			def query = type.find()
+			addDefaultFilters(query)
+			query.asList()
         }
+
+		type.metaClass.'static'.findAllInDB = {
+			MorphiaFactory.ds().find(type).asList()
+		}
 
         type.metaClass.'static'.findById = { String id ->
             if (id) {
@@ -39,11 +58,14 @@ class MorphiaModelEnhancer {
         }
 
         type.metaClass.'static'.count = {
-            MorphiaFactory.ds().find(type).countAll()
+            def query = MorphiaFactory.ds().find(type)
+			addDefaultFilters(query)
+			query.countAll()
         }
 
         type.metaClass.'static'.count = { String keys, Object[] values ->
             Query query = type.find()
+			addDefaultFilters(query)
             keys.split(",").eachWithIndex { key, i ->
                 query.filter(key, values[i])
             }

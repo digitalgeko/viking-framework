@@ -66,7 +66,6 @@ class VikingPortlet extends GenericPortlet
 
 		WorkflowUtils.registerHandlers()
 
-
 		isDevEnabled = Conf.properties.dev.enabled
 		if (isDevEnabled) {
 			Logger.info("Running viking on DEV mode!")

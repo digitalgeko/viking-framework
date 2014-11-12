@@ -84,6 +84,7 @@ class HibernateFactory {
 	static closeCurrentSession() {
 		Session session = sessionThreadLocal.get()
 		if (session) {
+			session.flush()
 			session.close()
 			sessionThreadLocal.remove()
 		}

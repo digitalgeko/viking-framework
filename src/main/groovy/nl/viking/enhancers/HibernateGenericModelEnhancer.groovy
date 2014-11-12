@@ -1,5 +1,6 @@
 package nl.viking.enhancers
 
+import nl.viking.controllers.Controller
 import nl.viking.db.HibernateFactory
 import nl.viking.model.hibernate.GenericModel
 import org.hibernate.Criteria
@@ -16,15 +17,27 @@ import org.hibernate.criterion.Restrictions
  */
 class HibernateGenericModelEnhancer {
 
+	private static addDefaultFilters(Criteria criteria) {
+		def h = Controller.currentDataHelper
+		if (h) {
+			criteria.add(Restrictions.eq("groupId", h.themeDisplay.scopeGroupId))
+			criteria.add(Restrictions.eq("companyId", h.themeDisplay.companyId))
+		}
+		criteria
+	}
     static enhance(Class<? extends GenericModel> type) {
+
 		type.metaClass.'static'.query = { closure ->
 			HibernateFactory.withSession { Session session ->
-				closure(session.createCriteria(type))
+				def criteria = session.createCriteria(type)
+				addDefaultFilters(criteria)
+				closure(criteria)
 			}
 		}
 
 		type.metaClass.'static'.find = { String keys, Object[] values ->
 			type.query { Criteria criteria ->
+				addDefaultFilters(criteria)
 				keys.split(",").eachWithIndex { key, i ->
 					criteria.add(Restrictions.eq(key, values[i]))
 				}
@@ -34,12 +47,21 @@ class HibernateGenericModelEnhancer {
 
 		type.metaClass.'static'.findAll = {
 			type.query { Criteria criteria ->
+				addDefaultFilters(criteria)
+				criteria.list()
+			}
+		}
+
+		type.metaClass.'static'.findAllInDB = {
+			HibernateFactory.withSession { Session session ->
+				def criteria = session.createCriteria(type)
 				criteria.list()
 			}
 		}
 
 		type.metaClass.'static'.count = {
 			type.query { Criteria criteria ->
+				addDefaultFilters(criteria)
 				criteria.setProjection(Projections.rowCount()).uniqueResult();
 			}
 		}

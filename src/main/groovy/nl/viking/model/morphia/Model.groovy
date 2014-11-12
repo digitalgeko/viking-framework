@@ -6,6 +6,7 @@ import com.google.code.morphia.annotations.Transient
 import com.google.code.morphia.query.Query
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
 import groovy.json.JsonBuilder
+import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.Asset
@@ -33,6 +34,10 @@ class Model implements Comparable<Model> {
 
     private long _updated
 
+	Long groupId
+
+	Long companyId
+
 	@Transient @JsonIgnore
 	AssetInfo assetInfo
 
@@ -47,6 +52,11 @@ class Model implements Comparable<Model> {
     }
 
     Model save() {
+		def h = Controller.currentDataHelper
+		if (h) {
+			groupId = groupId ?: h.themeDisplay.scopeGroupId
+			companyId = companyId ?: h.themeDisplay.companyId
+		}
 
 		def crudOperation
 		if (_id) {
@@ -129,6 +139,10 @@ class Model implements Comparable<Model> {
     static List findAll() {
         return null
     }
+
+	static List findAllInDB() {
+		return null
+	}
 
     static Model findById(String id) {
         return null
