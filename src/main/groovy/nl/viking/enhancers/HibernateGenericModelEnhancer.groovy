@@ -20,7 +20,6 @@ class HibernateGenericModelEnhancer {
 	private static addDefaultFilters(Criteria criteria) {
 		def h = Controller.currentDataHelper
 		if (h) {
-			criteria.add(Restrictions.eq("groupId", h.themeDisplay.scopeGroupId))
 			criteria.add(Restrictions.eq("companyId", h.themeDisplay.companyId))
 		}
 		criteria

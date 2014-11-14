@@ -19,7 +19,6 @@ class MorphiaModelEnhancer {
 	private static addDefaultFilters(Query query) {
 		def h = Controller.currentDataHelper
 		if (h) {
-			query.filter("groupId", h.themeDisplay.scopeGroupId)
 			query.filter("companyId", h.themeDisplay.companyId)
 		}
 		query
