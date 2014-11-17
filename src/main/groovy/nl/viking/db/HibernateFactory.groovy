@@ -28,8 +28,6 @@ class HibernateFactory {
 
 	private static SessionFactory sessionFactory;
 
-	public static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal();
-
 	static final Configuration cfg = new Configuration();
 
 	synchronized static SessionFactory getSessionFactory() {
@@ -40,6 +38,7 @@ class HibernateFactory {
 			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
 			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
 
+			cfg.setProperty("hibernate.current_session_context_class", "thread")
 			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
 
 			if (Conf.properties.hibernate.prefix) {
@@ -66,22 +65,14 @@ class HibernateFactory {
 	}
 
 	static Session getCurrentSession () {
-		Session session = sessionThreadLocal.get()
-		if (session) {
-			return session;
-		} else {
-			session = HibernateFactory.sessionFactory.openSession()
-			sessionThreadLocal.set(session)
-			return session
-		}
+		Session session = sessionFactory.getCurrentSession()
+		return session
 	}
 
 	static closeCurrentSession() {
-		Session session = sessionThreadLocal.get()
+		Session session = sessionFactory.getCurrentSession()
 		if (session) {
-			session.flush()
 			session.close()
-			sessionThreadLocal.remove()
 		}
 	}
 
