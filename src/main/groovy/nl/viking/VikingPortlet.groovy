@@ -54,8 +54,6 @@ class VikingPortlet extends GenericPortlet
 			}.name
 		}
 
-		HibernateFactory.getSessionFactory()
-
 		ModelEnhancer.enhanceAllModels()
 
 		ModelResourcesUtils.registerAllModels(portletContext)
@@ -165,7 +163,6 @@ class VikingPortlet extends GenericPortlet
 			}
 		}
 
-		HibernateFactory.closeCurrentSession()
 		controllerThreadLocal.remove()
 		servletContextThreadLocal.remove()
 	}

@@ -1,21 +1,21 @@
 package nl.viking.db
 
 import com.liferay.portal.kernel.util.PropsUtil
-import com.liferay.portal.security.permission.PermissionThreadLocal
-import com.liferay.portal.util.PortalUtil
 import groovy.transform.Synchronized
 import nl.viking.Conf
 import nl.viking.VikingPortlet
 import nl.viking.db.hibernate.strategy.VikingNamingStrategy
 import nl.viking.logging.Logger
 import nl.viking.utils.ReflectionUtils
-import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
-import org.reflections.Reflections
 
 import javax.persistence.Entity
+import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
+import javax.persistence.Persistence
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,9 +28,47 @@ class HibernateFactory {
 
 	private static SessionFactory sessionFactory;
 
+	private static EntityManagerFactory entityManagerFactory
+
+	private static final ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal();
+
 	static final Configuration cfg = new Configuration();
 
-	synchronized static SessionFactory getSessionFactory() {
+	synchronized static EntityManagerFactory getEntityManagerFactory() {
+		if (entityManagerFactory == null) {
+			// Defaults
+			cfg.setProperty("hibernate.connection.driver_class", PropsUtil.get("jdbc.default.driverClassName"))
+			cfg.setProperty("hibernate.connection.url", PropsUtil.get("jdbc.default.url"))
+			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
+			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
+
+//			cfg.setProperty("hibernate.current_session_context_class", "thread")
+			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
+
+			if (Conf.properties.hibernate.prefix) {
+				cfg.setNamingStrategy(new VikingNamingStrategy())
+			}
+
+			Conf.properties.hibernate.flatten().each {
+				cfg.setProperty("hibernate."+it.key, it.value)
+			}
+
+			// Hibernate entities
+			def additionalModelPackages = Conf.properties.models.additionalPackages ?: []
+			def modelPackages = ['models'] + additionalModelPackages
+
+			def modelClasses = ReflectionUtils.getModelClassesWithAnnotations(modelPackages, Entity.class)
+			modelClasses.each { type ->
+				cfg.addAnnotatedClass(type);
+			}
+
+			entityManagerFactory = Persistence.createEntityManagerFactory( "viking", cfg.getProperties() );
+		}
+
+		return entityManagerFactory
+	}
+
+	synchronized static SessionFactory  getSessionFactory() {
 		if (sessionFactory == null) {
 			// Defaults
 			cfg.setProperty("hibernate.connection.driver_class", PropsUtil.get("jdbc.default.driverClassName"))
@@ -53,53 +91,67 @@ class HibernateFactory {
 			def additionalModelPackages = Conf.properties.models.additionalPackages ?: []
 			def modelPackages = ['models'] + additionalModelPackages
 
-			def modelClasses = ReflectionUtils.getModelClassesWithAnnotations(modelPackages, Entity.class, org.hibernate.annotations.Entity.class)
+			def modelClasses = ReflectionUtils.getModelClassesWithAnnotations(modelPackages, Entity.class)
 			modelClasses.each { type ->
 				cfg.addAnnotatedClass(type);
 			}
 
-			sessionFactory = cfg.buildSessionFactory();
+			def serviceRegistry = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties()).build();
+
+			sessionFactory = cfg.buildSessionFactory(serviceRegistry);
 		}
 
 		return sessionFactory
 	}
 
-	static Session getCurrentSession () {
-		Session session = sessionFactory.getCurrentSession()
-		return session
+	@Synchronized
+	synchronized static EntityManager getCurrentEntityManager () {
+		def em = entityManagerThreadLocal.get()
+		if (!em) {
+			em = getEntityManagerFactory().createEntityManager()
+			entityManagerThreadLocal.set(em)
+		}
+		return em
 	}
 
-	static closeCurrentSession() {
-		Session session = sessionFactory.getCurrentSession()
-		if (session) {
-			session.close()
+	@Synchronized
+	synchronized static closeCurrentEntityManager() {
+		def em = getCurrentEntityManager()
+		if (em) {
+			em.close()
 		}
 	}
 
 	@Synchronized
-	synchronized static withSession (Closure closure) {
-		Session session = getCurrentSession();
-		def returnValue = null
-		try{
-			session.beginTransaction()
-			returnValue = closure(session)
-			session.transaction.commit()
+	synchronized static withEntityManager (Closure closure) {
+		EntityManager entityManager = getCurrentEntityManager()
+
+		def returnValue
+		try {
+			entityManager.transaction.begin()
+			returnValue = closure(entityManager)
+			entityManager.transaction.commit()
 		} catch (Exception e) {
-			session.transaction.rollback();
+			entityManager.transaction.rollback();
 			Logger.error(e, "Hibernate problem")
 		} finally {
 			if (!VikingPortlet.currentController) {
-				closeCurrentSession()
+				closeCurrentEntityManager()
 			}
 		}
-
 		returnValue
+
+
 	}
 
 
 	static void destroy() {
+		if (entityManagerFactory != null) {
+			entityManagerFactory.close()
+			entityManagerFactory = null
+		}
 		if (sessionFactory != null) {
-			closeCurrentSession()
+			closeCurrentEntityManager()
 			sessionFactory.close()
 			sessionFactory = null
 		}

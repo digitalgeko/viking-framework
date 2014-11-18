@@ -2,7 +2,6 @@ package nl.viking.model.hibernate
 
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil
 import com.liferay.portal.service.ServiceContext
-import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil
 import com.liferay.portal.util.PortalUtil
 import groovy.json.JsonBuilder
 import nl.viking.model.annotation.Asset
@@ -14,6 +13,11 @@ import org.codehaus.jackson.annotate.JsonIgnore
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
+import javax.persistence.PostPersist
+import javax.persistence.PostRemove
+import javax.persistence.PostUpdate
+import javax.persistence.PrePersist
+import javax.persistence.PreUpdate
 import javax.persistence.Transient
 
 /**
@@ -43,18 +47,30 @@ class Model extends GenericModel implements Comparable<Model>{
 
 	@Override
 	Model save() {
+		def obj = super.save()
+		return obj;
+	}
 
-		def crudOperation
+	@PrePersist @PreUpdate
+	void setTimestamps() {
 		if (id) {
-			crudOperation = "update"
 			updated = new Date()
 		} else {
-			crudOperation = "create"
 			created = updated = new Date()
 		}
+	}
 
-		def obj = super.save()
+	def registerSocialActivity(crudOperation) {
+		if (this.class.isAnnotationPresent(SocialActivity)) {
+			def socialActivityInfo = getSocialActivityInfo()
+			socialActivityInfo.className = this.class.name
+			socialActivityInfo.classPK = this.id
+			socialActivityInfo.extraData = new JsonBuilder([classUuid: id.toString(), crudOperation: crudOperation]).toString()
+			socialActivityInfo.register()
+		}
+	}
 
+	def registerAsset() {
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
 			assetInfo.classPK = this.id
@@ -70,42 +86,47 @@ class Model extends GenericModel implements Comparable<Model>{
 				}
 			}
 		}
-
-		if (this.class.isAnnotationPresent(SocialActivity)) {
-			def socialActivityInfo = getSocialActivityInfo()
-			socialActivityInfo.className = this.class.name
-			socialActivityInfo.classPK = this.id
-			socialActivityInfo.extraData = new JsonBuilder([classUuid: id.toString(), crudOperation: crudOperation]).toString()
-			socialActivityInfo.register()
-		}
-
-		return obj;
+	}
+	@PostPersist
+	void postPersist() {
+		registerAsset()
+		registerSocialActivity("create")
 	}
 
-	@Override
-	def delete() {
+	@PostUpdate
+	void postUpdate() {
+		registerAsset()
+		registerSocialActivity("update")
+	}
 
-		def obj = super.delete()
+	def unregisterAsset() {
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
 			assetInfo.classPK = this.id
 			assetInfo.delete()
 		}
+	}
 
-		if (this.class.isAnnotationPresent(SocialActivity)) {
-			def socialActivityInfo = getSocialActivityInfo()
-			socialActivityInfo.className = this.class.name
-			socialActivityInfo.classPK = this.id
-			socialActivityInfo.extraData = new JsonBuilder([classUuid: id.toString(), crudOperation: "delete"]).toString()
-			socialActivityInfo.register()
-		}
+	@PostRemove
+	void postRemove() {
+		unregisterAsset()
+		registerSocialActivity("delete")
+	}
 
+	@Override
+	def delete() {
+		def obj = super.delete()
 		obj
 	}
 
 	@Override
 	int compareTo(Model t) {
 		return t.id.compareTo(this.id)
+	}
+
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		this.id == other.id && this.class == other.class
 	}
 
 	static Model findById(Long id) {

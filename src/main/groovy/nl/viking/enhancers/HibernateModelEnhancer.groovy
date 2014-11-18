@@ -1,8 +1,11 @@
 package nl.viking.enhancers
 
+import nl.viking.db.HibernateFactory
 import nl.viking.model.hibernate.Model
 import org.hibernate.Criteria
 import org.hibernate.criterion.Restrictions
+
+import javax.persistence.EntityManager
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,19 +17,22 @@ import org.hibernate.criterion.Restrictions
 class HibernateModelEnhancer {
 
     static enhance(Class<? extends Model> type) {
+
 		type.metaClass.'static'.findById = { Long id ->
 			if (id) {
-				return type.query { Criteria criteria ->
-					criteria.add(Restrictions.eq("id", id)).uniqueResult()
+				return HibernateFactory.withEntityManager { EntityManager em ->
+					em.find(type, id)
 				}
 			}
 			return null
 		}
+
 		type.metaClass.'static'.findById = { String id ->
 			if (id && id.isNumber()) {
-				return type.findById(new Long(id))
+				return type.findById(id as Long)
 			}
 			return null
 		}
+
     }
 }

@@ -1,12 +1,18 @@
 package nl.viking.model.hibernate
 
+import com.google.code.morphia.annotations.PostPersist
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
 import nl.viking.controllers.Controller
 import nl.viking.db.HibernateFactory
 import nl.viking.model.annotation.Searchable
 import org.hibernate.Session
 
+import javax.persistence.Query
+import javax.persistence.EntityManager
 import javax.persistence.MappedSuperclass
+import javax.persistence.PostRemove
+import javax.persistence.PostUpdate
+import javax.persistence.PrePersist
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,43 +29,55 @@ class GenericModel {
 	Long companyId
 
 	GenericModel save() {
+		HibernateFactory.withEntityManager { EntityManager em ->
+			em.persist(this)
+		}
+		return this
+	}
 
+	@PrePersist
+	void prePersist() {
+		setDefaultFields()
+	}
+
+	def setDefaultFields() {
 		def h = Controller.currentDataHelper
 		if (h) {
 			groupId = groupId ?: h.themeDisplay.scopeGroupId
 			companyId = companyId ?: h.themeDisplay.companyId
 		}
+	}
 
-		HibernateFactory.withSession { Session session ->
-			session.saveOrUpdate(this)
-		}
+	@PostPersist @PostUpdate
+	void postPersist() {
+		registerSearchIndex()
+	}
 
+	def registerSearchIndex() {
 		if (this.class.isAnnotationPresent(Searchable)) {
 			def indexer = IndexerRegistryUtil.getIndexer(this.class)
 			indexer.reindex(this)
 		}
-
-		return this
 	}
-
-	def delete () {
-
+	def unregisterSearchIndex() {
 		if (this.class.isAnnotationPresent(Searchable)) {
 			def indexer = IndexerRegistryUtil.getIndexer(this.class)
 			indexer.delete(this)
 		}
+	}
 
-		HibernateFactory.withSession { Session session ->
-			session.delete(this)
+	@PostRemove
+	void postRemove() {
+		unregisterSearchIndex()
+	}
+
+	def delete () {
+		HibernateFactory.withEntityManager { EntityManager em ->
+			em.remove(this)
 		}
-
 	}
 
-	static def query(Closure closure) {
-		return null
-	}
-
-	static List<Model> find(String keys, Object... values) {
+	static Query find(String whereStr = null, Map<String, Object> values = [:]) {
 		return null
 	}
 
@@ -71,11 +89,7 @@ class GenericModel {
 		return null
 	}
 
-	static Number count() {
-		return 0
-	}
-
-	static Number count(String keys, Object... values) {
+	static Number count(String whereStr = null, Map<String, Object> values = [:]) {
 		return 0
 	}
 

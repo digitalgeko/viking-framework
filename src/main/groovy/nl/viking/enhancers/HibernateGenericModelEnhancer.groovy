@@ -8,6 +8,9 @@ import org.hibernate.Session
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 
+import javax.persistence.EntityManager
+import javax.persistence.Query
+
 /**
  * Created with IntelliJ IDEA.
  * User: mardo
@@ -26,47 +29,32 @@ class HibernateGenericModelEnhancer {
 	}
     static enhance(Class<? extends GenericModel> type) {
 
-		type.metaClass.'static'.query = { closure ->
-			HibernateFactory.withSession { Session session ->
-				def criteria = session.createCriteria(type)
-				addDefaultFilters(criteria)
-				closure(criteria)
-			}
-		}
-
-		type.metaClass.'static'.find = { String keys, Object[] values ->
-			type.query { Criteria criteria ->
-				addDefaultFilters(criteria)
-				keys.split(",").eachWithIndex { key, i ->
-					criteria.add(Restrictions.eq(key, values[i]))
+		type.metaClass.'static'.find = { String whereStr = null, Map<String, Object> values = [:] ->
+			HibernateFactory.withEntityManager { EntityManager em ->
+				def queryStr = " from $type.simpleName "
+				if (whereStr) {
+					queryStr += " where $whereStr "
 				}
-				criteria.list()
+				def query = em.createQuery( queryStr, type )
+				values.each {
+					query.setParameter(it.key, it.value)
+				}
+				query
 			}
 		}
 
 		type.metaClass.'static'.findAll = {
-			type.query { Criteria criteria ->
-				addDefaultFilters(criteria)
-				criteria.list()
-			}
+			type.find().resultList
 		}
 
 		type.metaClass.'static'.findAllInDB = {
-			HibernateFactory.withSession { Session session ->
-				def criteria = session.createCriteria(type)
-				criteria.list()
-			}
+			type.find().resultList
 		}
 
-		type.metaClass.'static'.count = {
-			type.query { Criteria criteria ->
-				addDefaultFilters(criteria)
-				criteria.setProjection(Projections.rowCount()).uniqueResult();
-			}
+		type.metaClass.'static'.count = { String whereStr = null, Map<String, Object> values = [:] ->
+			Query query = type.find(whereStr, values)
+			query.singleResult
 		}
 
-		type.metaClass.'static'.count = { String keys, Object[] values ->
-			type.find(keys,values).setProjection(Projections.rowCount()).uniqueResult();
-		}
     }
 }
