@@ -29,17 +29,21 @@ class HibernateGenericModelEnhancer {
 	}
     static enhance(Class<? extends GenericModel> type) {
 
-		type.metaClass.'static'.find = { String whereStr = null, Map<String, Object> values = [:] ->
+		type.metaClass.'static'.query = { String queryStr = null, Map<String, Object> values = [:] ->
 			EntityManager em = HibernateFactory.currentEntityManager
-			def queryStr = " from $type.simpleName "
-			if (whereStr) {
-				queryStr += " where $whereStr "
-			}
 			def query = em.createQuery( queryStr, type )
 			values.each {
 				query.setParameter(it.key, it.value)
 			}
 			query
+		}
+
+		type.metaClass.'static'.find = { String whereStr = null, Map<String, Object> values = [:] ->
+			def queryStr = " FROM $type.simpleName "
+			if (whereStr) {
+				queryStr += " WHERE $whereStr "
+			}
+			type.query(queryStr, values)
 		}
 
 		type.metaClass.'static'.findAll = {
@@ -51,7 +55,16 @@ class HibernateGenericModelEnhancer {
 		}
 
 		type.metaClass.'static'.count = { String whereStr = null, Map<String, Object> values = [:] ->
-			Query query = type.find(whereStr, values)
+			EntityManager em = HibernateFactory.currentEntityManager
+			def queryStr = " SELECT COUNT(*) FROM $type.simpleName "
+			if (whereStr) {
+				queryStr += " WHERE $whereStr "
+			}
+			def query = em.createQuery( queryStr, Long.class )
+			values.each {
+				query.setParameter(it.key, it.value)
+			}
+			query
 			query.singleResult
 		}
 

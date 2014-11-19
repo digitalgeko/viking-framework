@@ -77,6 +77,10 @@ class GenericModel {
 		}
 	}
 
+	static Query query(String queryStr = null, Map<String, Object> values = [:]) {
+		return null
+	}
+
 	static Query find(String whereStr = null, Map<String, Object> values = [:]) {
 		return null
 	}
