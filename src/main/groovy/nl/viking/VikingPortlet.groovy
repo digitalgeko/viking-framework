@@ -165,6 +165,7 @@ class VikingPortlet extends GenericPortlet
 
 		controllerThreadLocal.remove()
 		servletContextThreadLocal.remove()
+		HibernateFactory.closeCurrentEntityManager()
 	}
 
 	@Override

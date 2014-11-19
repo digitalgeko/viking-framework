@@ -76,7 +76,7 @@ class HibernateFactory {
 			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
 			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
 
-			cfg.setProperty("hibernate.current_session_context_class", "thread")
+//			cfg.setProperty("hibernate.current_session_context_class", "thread")
 			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
 
 			if (Conf.properties.hibernate.prefix) {
@@ -119,6 +119,7 @@ class HibernateFactory {
 		def em = getCurrentEntityManager()
 		if (em) {
 			em.close()
+			entityManagerThreadLocal.remove()
 		}
 	}
 
@@ -132,8 +133,8 @@ class HibernateFactory {
 			returnValue = closure(entityManager)
 			entityManager.transaction.commit()
 		} catch (Exception e) {
+			Logger.error(e, "*********** Hibernate problem ***********")
 			entityManager.transaction.rollback();
-			Logger.error(e, "Hibernate problem")
 		} finally {
 			if (!VikingPortlet.currentController) {
 				closeCurrentEntityManager()

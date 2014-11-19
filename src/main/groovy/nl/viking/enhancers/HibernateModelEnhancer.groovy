@@ -21,7 +21,7 @@ class HibernateModelEnhancer {
 		type.metaClass.'static'.findById = { Long id ->
 			if (id) {
 				EntityManager em = HibernateFactory.currentEntityManager
-				em.find(type, id)
+				return em.find(type, id)
 			}
 			return null
 		}
