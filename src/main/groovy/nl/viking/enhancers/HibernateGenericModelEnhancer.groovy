@@ -30,17 +30,16 @@ class HibernateGenericModelEnhancer {
     static enhance(Class<? extends GenericModel> type) {
 
 		type.metaClass.'static'.find = { String whereStr = null, Map<String, Object> values = [:] ->
-			HibernateFactory.withEntityManager { EntityManager em ->
-				def queryStr = " from $type.simpleName t "
-				if (whereStr) {
-					queryStr += " where $whereStr "
-				}
-				def query = em.createQuery( queryStr, type )
-				values.each {
-					query.setParameter(it.key, it.value)
-				}
-				query
+			EntityManager em = HibernateFactory.currentEntityManager
+			def queryStr = " from $type.simpleName "
+			if (whereStr) {
+				queryStr += " where $whereStr "
 			}
+			def query = em.createQuery( queryStr, type )
+			values.each {
+				query.setParameter(it.key, it.value)
+			}
+			query
 		}
 
 		type.metaClass.'static'.findAll = {
