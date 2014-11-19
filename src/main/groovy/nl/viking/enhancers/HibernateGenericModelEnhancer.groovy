@@ -31,7 +31,7 @@ class HibernateGenericModelEnhancer {
 
 		type.metaClass.'static'.find = { String whereStr = null, Map<String, Object> values = [:] ->
 			HibernateFactory.withEntityManager { EntityManager em ->
-				def queryStr = " from $type.simpleName "
+				def queryStr = " from $type.simpleName t "
 				if (whereStr) {
 					queryStr += " where $whereStr "
 				}
