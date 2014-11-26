@@ -1,9 +1,10 @@
 package nl.viking.model.morphia
 
-import com.google.code.morphia.Datastore
-import com.google.code.morphia.annotations.Id
-import com.google.code.morphia.annotations.Transient
-import com.google.code.morphia.query.Query
+import nl.viking.utils.MongoUtils
+import org.mongodb.morphia.Datastore
+import org.mongodb.morphia.annotations.Id
+import org.mongodb.morphia.annotations.Transient
+import org.mongodb.morphia.query.Query
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
 import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
@@ -71,7 +72,7 @@ class Model implements Comparable<Model> {
 
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
-			assetInfo.classPK = _id.inc
+			assetInfo.classPK = MongoUtils.objectIdToLong(_id)
 			assetInfo.classUuid = _id.toString()
 			assetInfo.register()
 		}
@@ -79,7 +80,7 @@ class Model implements Comparable<Model> {
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
 			socialActivityInfo.className = this.class.name
-			socialActivityInfo.classPK = _id.inc
+			socialActivityInfo.classPK = MongoUtils.objectIdToLong(_id)
 			socialActivityInfo.extraData = new JsonBuilder([classUuid: _id.toString(), crudOperation: crudOperation]).toString()
 			socialActivityInfo.register()
 		}
@@ -97,7 +98,7 @@ class Model implements Comparable<Model> {
 
 		if (this.class.isAnnotationPresent(Asset)) {
 			def assetInfo = getAssetInfo()
-			assetInfo.classPK = _id.inc
+			assetInfo.classPK = MongoUtils.objectIdToLong(_id)
 			assetInfo.classUuid = _id.toString()
 			assetInfo.delete()
 		}
@@ -105,7 +106,7 @@ class Model implements Comparable<Model> {
 		if (this.class.isAnnotationPresent(SocialActivity)) {
 			def socialActivityInfo = getSocialActivityInfo()
 			socialActivityInfo.className = this.class.name
-			socialActivityInfo.classPK = _id.inc
+			socialActivityInfo.classPK = MongoUtils.objectIdToLong(_id)
 			socialActivityInfo.extraData = new JsonBuilder([classUuid: _id.toString(), crudOperation: "delete"]).toString()
 			socialActivityInfo.register()
 		}

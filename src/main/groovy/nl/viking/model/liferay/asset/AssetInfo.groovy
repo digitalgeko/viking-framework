@@ -9,6 +9,7 @@ import com.sun.org.apache.xpath.internal.operations.Mod
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
 import nl.viking.model.hibernate.Model
+import nl.viking.utils.MongoUtils
 import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
@@ -83,7 +84,7 @@ class AssetInfo {
 	AssetInfo(nl.viking.model.morphia.Model model) {
 		this.className = model.class.name
 		if (model.id) {
-			this.classPK = model._id.inc
+			this.classPK = MongoUtils.objectIdToLong(model._id)
 			this.classUuid = model.id
 		}
 		fill(Controller.currentDataHelper)

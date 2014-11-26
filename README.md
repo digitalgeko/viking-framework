@@ -484,7 +484,7 @@ Let's create a morphia model:
 ```
 package models
 
-import com.google.code.morphia.annotations.Entity
+import org.mongodb.morphia.annotations.Entity
 import nl.viking.model.morphia.Model
 
 @Entity

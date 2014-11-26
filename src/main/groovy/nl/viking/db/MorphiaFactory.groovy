@@ -1,8 +1,11 @@
 package nl.viking.db
 
-import com.google.code.morphia.Datastore
-import com.google.code.morphia.Morphia
+import com.mongodb.MongoClient
+import com.mongodb.MongoCredential
+import org.mongodb.morphia.Morphia
 import com.mongodb.Mongo
+import org.mongodb.morphia.Datastore
+
 
 
 /**
@@ -20,12 +23,12 @@ class MorphiaFactory {
 
     static Datastore ds() {
         if (dataStore == null  && GMongoProps.getDBHost()) {
-            def mongo = new Mongo(GMongoProps.getDBHost(), GMongoProps.getDBPort())
+            def mongo = new MongoClient(GMongoProps.getDBHost(), GMongoProps.getDBPort())
             if (GMongoProps.getDBUsername() != null) {
-                dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName(), GMongoProps.getDBUsername(), GMongoProps.getDBPassword().toCharArray())
-            } else {
-                dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
+				def credentials = MongoCredential.createMongoCRCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
+				mongo.credentialsList.add(credentials)
             }
+			dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
         }
         return dataStore
     }
@@ -38,7 +41,7 @@ class MorphiaFactory {
 		if (isMongoDefined == null) {
 			isMongoDefined = true;
 			try {
-				new Mongo(GMongoProps.getDBHost(), GMongoProps.getDBPort())
+				new MongoClient(GMongoProps.getDBHost(), GMongoProps.getDBPort())
 			} catch (e) {
 				isMongoDefined = false;
 			}
