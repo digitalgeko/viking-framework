@@ -53,17 +53,6 @@ class VikingPortlet extends GenericPortlet
 				return false
 			}.name
 		}
-
-		ModelEnhancer.enhanceAllModels()
-
-		ModelResourcesUtils.registerAllModels(portletContext)
-
-		IndexerUtils.registerAllModelIndexers()
-
-		AssetFactoryUtils.registerAllFactories()
-
-		WorkflowUtils.registerHandlers()
-
 		isDevEnabled = Conf.properties.dev.enabled
 		if (isDevEnabled) {
 			Logger.info("Running viking on DEV mode!")
@@ -207,9 +196,4 @@ class VikingPortlet extends GenericPortlet
 		routeMethod(request, response)
 	}
 
-	@PreDestroy
-	def void destroy() {
-		Logger.info("Destroying %s resources...", getPortletName())
-		HibernateFactory.destroy()
-	}
 }
