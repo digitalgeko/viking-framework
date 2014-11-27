@@ -24,7 +24,6 @@ jar {
 
 repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
-    maven { url "http://morphia.googlecode.com/svn/mavenrepo" }
     maven { url "http://repo1.maven.org/maven2/com/fasterxml/jackson/" }
 }
 

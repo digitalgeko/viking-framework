@@ -612,32 +612,28 @@ def person = Person.findById(personId)
 ```
 Where `personId` is a long.
 
-Using `find(fields, values)`
+Using `find(whereString, valueMap)`
+
+This method will return a **javax.persistence.Query**, so you can do something like:
 ```
 // list of records
-def somePeople = Person.find("age", 21)
+def somePeople = Person.find("age = :age", [age: 21]).resultList
 
 def allPeople = Person.findAll()
 
 // Complex queries
-def youngPeople = Person.query { Criteria criteria ->
-	criteria.add(Restrictions.lt("age", 18))
-	criteria.list()
-}
+def youngPeopleAge = Person.query("SELECT p.age FROM Person p WHERE age < :maxAge", [maxAge: 18]).resultList
 
 // Single record
-def mike = Person.query { Criteria criteria ->
-	criteria.add(Restrictions.eq("name", "Mike"))
-	criteria.uniqueResult()
-}
-```
+def mike = = Person.find("name = :name", [age: "Mike"]).singleResult
 
-Note that `find(fields, values)` returns a list of models, rather than a query (like in Morphia does).
+```
 
 ##### Update
 To **update** a model, is almost the same, but you retrieve a record from the database instead of creating a new instance:
 ```
 def person = Person.findById(personId)
+person.name = "Bob"
 person.save()
 ```
 
