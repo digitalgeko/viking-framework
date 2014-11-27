@@ -6,7 +6,6 @@ import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler
-import com.liferay.portal.security.permission.ResourceActions
 import com.liferay.portal.security.permission.ResourceActionsUtil
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
 import nl.viking.model.annotation.Workflow

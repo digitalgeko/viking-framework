@@ -5,20 +5,12 @@ import com.liferay.portal.service.ServiceContext
 import com.liferay.portal.util.PortalUtil
 import groovy.json.JsonBuilder
 import nl.viking.model.annotation.Asset
-import nl.viking.model.liferay.asset.AssetInfo
 import nl.viking.model.annotation.SocialActivity
+import nl.viking.model.liferay.asset.AssetInfo
 import nl.viking.model.liferay.socialactivity.SocialActivityInfo
 import org.codehaus.jackson.annotate.JsonIgnore
 
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.PostPersist
-import javax.persistence.PostRemove
-import javax.persistence.PostUpdate
-import javax.persistence.PrePersist
-import javax.persistence.PreUpdate
-import javax.persistence.Transient
+import javax.persistence.*
 
 /**
  * Created with IntelliJ IDEA.

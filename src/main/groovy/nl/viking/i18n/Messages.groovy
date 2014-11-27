@@ -5,8 +5,6 @@ import nl.viking.db.MorphiaFactory
 import nl.viking.logging.Logger
 import nl.viking.model.internal.VikingMessageEntry
 
-import javax.portlet.PortletConfig
-
 /**
  * Created with IntelliJ IDEA.
  * User: mardo

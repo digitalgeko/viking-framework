@@ -2,11 +2,8 @@ package nl.viking.db
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
-import org.mongodb.morphia.Morphia
-import com.mongodb.Mongo
 import org.mongodb.morphia.Datastore
-
-
+import org.mongodb.morphia.Morphia
 
 /**
  * Created with IntelliJ IDEA.

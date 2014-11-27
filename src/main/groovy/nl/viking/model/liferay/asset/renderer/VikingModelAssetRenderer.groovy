@@ -1,6 +1,5 @@
 package nl.viking.model.liferay.asset.renderer
 
-import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse
 import com.liferay.portal.kernel.portlet.LiferayWindowState
@@ -13,12 +12,7 @@ import nl.viking.logging.Logger
 import nl.viking.model.annotation.Asset
 import nl.viking.utils.TemplateUtils
 
-import javax.portlet.PortletRequest
-import javax.portlet.PortletURL
-import javax.portlet.RenderRequest
-import javax.portlet.RenderResponse
-import javax.portlet.WindowState
-import javax.portlet.WindowStateException
+import javax.portlet.*
 
 /**
  * User: mardo

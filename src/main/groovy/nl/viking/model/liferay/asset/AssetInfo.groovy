@@ -1,11 +1,7 @@
 package nl.viking.model.liferay.asset
 
 import com.liferay.portal.kernel.util.StringPool
-import com.liferay.portlet.asset.service.AssetEntryLocalService
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
-import com.liferay.portlet.asset.service.AssetEntryService
-import com.liferay.portlet.asset.service.AssetEntryServiceUtil
-import com.sun.org.apache.xpath.internal.operations.Mod
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
 import nl.viking.model.hibernate.Model

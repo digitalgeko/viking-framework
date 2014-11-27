@@ -1,11 +1,8 @@
 package nl.viking.utils
 
-import com.liferay.portal.kernel.language.Language
-import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.security.permission.ResourceActionsUtil
 import groovy.text.SimpleTemplateEngine
 import nl.viking.model.annotation.ModelResource
-import org.reflections.Reflections
 
 import javax.portlet.PortletContext
 

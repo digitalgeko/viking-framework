@@ -1,9 +1,9 @@
 package nl.viking.model.internal
 
-import org.mongodb.morphia.annotations.Entity
-import org.mongodb.morphia.annotations.Indexed
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.morphia.Model
+import org.mongodb.morphia.annotations.Entity
+import org.mongodb.morphia.annotations.Indexed
 
 /**
  * User: mardo

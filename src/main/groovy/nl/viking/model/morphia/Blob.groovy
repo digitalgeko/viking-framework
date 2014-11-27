@@ -1,8 +1,8 @@
 package nl.viking.model.morphia
 
-import org.mongodb.morphia.annotations.Embedded
 import com.mongodb.gridfs.GridFSDBFile
 import nl.viking.db.GridFSUtils
+import org.mongodb.morphia.annotations.Embedded
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,18 +1,11 @@
 package nl.viking.model.hibernate
 
-import com.google.code.morphia.annotations.PostPersist
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
 import nl.viking.controllers.Controller
 import nl.viking.db.HibernateFactory
 import nl.viking.model.annotation.Searchable
-import org.hibernate.Session
 
-import javax.persistence.Query
-import javax.persistence.EntityManager
-import javax.persistence.MappedSuperclass
-import javax.persistence.PostRemove
-import javax.persistence.PostUpdate
-import javax.persistence.PrePersist
+import javax.persistence.*
 
 /**
  * Created with IntelliJ IDEA.

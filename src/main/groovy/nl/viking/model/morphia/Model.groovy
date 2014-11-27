@@ -1,21 +1,21 @@
 package nl.viking.model.morphia
 
-import nl.viking.utils.MongoUtils
-import org.mongodb.morphia.Datastore
-import org.mongodb.morphia.annotations.Id
-import org.mongodb.morphia.annotations.Transient
-import org.mongodb.morphia.query.Query
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
 import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
-import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.Asset
-import nl.viking.model.liferay.asset.AssetInfo
+import nl.viking.model.annotation.Searchable
 import nl.viking.model.annotation.SocialActivity
+import nl.viking.model.liferay.asset.AssetInfo
 import nl.viking.model.liferay.socialactivity.SocialActivityInfo
+import nl.viking.utils.MongoUtils
 import org.bson.types.ObjectId
 import org.codehaus.jackson.annotate.JsonIgnore
+import org.mongodb.morphia.Datastore
+import org.mongodb.morphia.annotations.Id
+import org.mongodb.morphia.annotations.Transient
+import org.mongodb.morphia.query.Query
 
 /**
  * Created with IntelliJ IDEA.

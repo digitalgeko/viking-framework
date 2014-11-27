@@ -2,10 +2,8 @@ package nl.viking.model.liferay.socialactivity
 
 import com.liferay.portal.kernel.util.StringPool
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil
-import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
-import nl.viking.model.hibernate.Model
 
 /**
  * User: mardo

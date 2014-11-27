@@ -2,8 +2,6 @@ package nl.viking.enhancers
 
 import nl.viking.db.HibernateFactory
 import nl.viking.model.hibernate.Model
-import org.hibernate.Criteria
-import org.hibernate.criterion.Restrictions
 
 import javax.persistence.EntityManager
 

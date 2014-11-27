@@ -1,6 +1,5 @@
 package nl.viking.utils
 
-import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil
 import com.liferay.portal.kernel.language.LanguageUtil
 import freemarker.template.Configuration
 import freemarker.template.Template

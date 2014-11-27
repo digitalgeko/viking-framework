@@ -4,12 +4,9 @@ import nl.viking.controllers.Controller
 import nl.viking.db.HibernateFactory
 import nl.viking.model.hibernate.GenericModel
 import org.hibernate.Criteria
-import org.hibernate.Session
-import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 
 import javax.persistence.EntityManager
-import javax.persistence.Query
 
 /**
  * Created with IntelliJ IDEA.

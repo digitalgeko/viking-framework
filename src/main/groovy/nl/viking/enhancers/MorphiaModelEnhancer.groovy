@@ -1,10 +1,10 @@
 package nl.viking.enhancers
 
-import org.mongodb.morphia.query.Query
 import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.morphia.Model
 import org.bson.types.ObjectId
+import org.mongodb.morphia.query.Query
 
 /**
  * Created with IntelliJ IDEA.

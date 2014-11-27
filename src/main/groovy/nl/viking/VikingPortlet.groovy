@@ -8,12 +8,7 @@ import nl.viking.controllers.annotation.Resource
 import nl.viking.db.HibernateFactory
 import nl.viking.enhancers.ModelEnhancer
 import nl.viking.logging.Logger
-import nl.viking.utils.AssetFactoryUtils
-import nl.viking.utils.IndexerUtils
-import nl.viking.utils.ModelResourcesUtils
-import nl.viking.utils.RenderUtils
-import nl.viking.utils.TemplateUtils
-import nl.viking.utils.WorkflowUtils
+import nl.viking.utils.*
 import org.reflections.Reflections
 
 import javax.annotation.PostConstruct

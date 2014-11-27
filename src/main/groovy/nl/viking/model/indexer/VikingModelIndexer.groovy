@@ -1,21 +1,10 @@
 package nl.viking.model.indexer
 
-import com.liferay.portal.kernel.language.LanguageUtil
-import com.liferay.portal.kernel.search.BaseIndexer
-import com.liferay.portal.kernel.search.BooleanQuery
-import com.liferay.portal.kernel.search.Document
-import com.liferay.portal.kernel.search.DocumentImpl
-import com.liferay.portal.kernel.search.Field
-import com.liferay.portal.kernel.search.SearchContext
-import com.liferay.portal.kernel.search.SearchEngineUtil
-import com.liferay.portal.kernel.search.SearchException
-import com.liferay.portal.kernel.search.Summary
+import com.liferay.portal.kernel.search.*
 import com.liferay.portal.util.PortalUtil
 import groovy.text.SimpleTemplateEngine
 import nl.viking.logging.Logger
 import nl.viking.model.annotation.Asset
-import nl.viking.model.annotation.Searchable
-import nl.viking.model.annotation.SearchableField
 import nl.viking.utils.TemplateUtils
 
 import javax.portlet.PortletURL
