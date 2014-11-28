@@ -134,16 +134,13 @@ class HibernateFactory {
 			entityManager.transaction.commit()
 		} catch (Exception e) {
 			Logger.error(e, "*********** Hibernate problem ***********")
-			entityManager.transaction.rollback();
-		} finally {
-			if (!VikingPortlet.currentController) {
-				closeCurrentEntityManager()
-			}
+			entityManager.transaction.rollback()
 		}
+
 		returnValue
-
-
 	}
+
+
 
 
 	static void destroy() {
