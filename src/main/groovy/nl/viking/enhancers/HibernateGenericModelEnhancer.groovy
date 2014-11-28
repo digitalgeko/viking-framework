@@ -28,7 +28,7 @@ class HibernateGenericModelEnhancer {
 
 		type.metaClass.'static'.query = { String queryStr = null, Map<String, Object> values = [:] ->
 			EntityManager em = HibernateFactory.currentEntityManager
-			def query = em.createQuery( queryStr, type )
+			def query = em.createQuery( queryStr )
 			values.each {
 				query.setParameter(it.key, it.value)
 			}

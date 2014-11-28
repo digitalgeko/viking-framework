@@ -5,6 +5,7 @@ import groovy.text.SimpleTemplateEngine
 import nl.viking.model.annotation.ModelResource
 
 import javax.portlet.PortletContext
+import javax.servlet.ServletContext
 
 /**
  * User: mardo
@@ -13,7 +14,7 @@ import javax.portlet.PortletContext
  */
 class ModelResourcesUtils {
 
-	static registerAllModels(PortletContext portletContext) {
+	static registerAllModels(ServletContext sce) {
 		def modelResourceTemplate = new SimpleTemplateEngine().createTemplate(ModelResourcesUtils.classLoader.getResource("templates/model-resource-template.xml"))
 
 		ReflectionUtils.getModelClassesWithAnnotations(ModelResource.class).each { modelClass ->
@@ -30,13 +31,13 @@ class ModelResourcesUtils {
 			]
 
 			if (!data.portlets) {
-				def liferayPortletXML = new XmlSlurper().parse(portletContext.getResourceAsStream("/WEB-INF/liferay-portlet.xml"))
+				def liferayPortletXML = new XmlSlurper().parse(sce.getResourceAsStream("/WEB-INF/liferay-portlet.xml"))
 				data.portlets = liferayPortletXML.portlet."portlet-name".collect { it }
 			}
 
 			def modelResourceXMLString = modelResourceTemplate.make(data).toString()
 			InputStream modelResourceXMLInputStream = new ByteArrayInputStream(modelResourceXMLString.bytes)
-			ResourceActionsUtil.read(portletContext.portletContextName, modelResourceXMLInputStream)
+			ResourceActionsUtil.read(sce.servletContextName, modelResourceXMLInputStream)
 		}
 	}
 
