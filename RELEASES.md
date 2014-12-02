@@ -9,7 +9,7 @@ The usage of hibernate models is completely different in this release. We're usi
 We've updated morphia to use org.mongodb morphia, instead of the old com.google.code morphia. This means that if you have morphia models you'll need to change the package **com.google.code** to **org.mongodb**. That's it.
 
 ### Arquillian
-We've introduced this awesome testing framework to execute the tests and you can now use it, check the docs [https://github.com/digitalgeko/viking-framework#tests](https://github.com/digitalgeko/viking-framework#tests).
+We've introduced this awesome testing framework to execute the tests and you can now use it, check the docs for more information [https://github.com/digitalgeko/viking-framework#tests](https://github.com/digitalgeko/viking-framework#tests).
 
 ### Additional notes
 * Updated jackson-jaxrs -> 1.9.13

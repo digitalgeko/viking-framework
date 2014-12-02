@@ -48,15 +48,15 @@ Main technologies used:
 
 If you use Mac OS, Ubuntu or Debian: Viking shell will automatically download the libreries it requires (using brew and apt-get respectively). If you use a different operating system (i.e. Windows), you must manually install:
 
-* Gradle ([http://www.gradle.org/](http://www.gradle.org/))
-* MySQL ([http://www.mysql.com/](http://www.mysql.com/))
-* Git ([http://git-scm.com/](http://git-scm.com/))
-* Maven ([http://maven.apache.org/](http://maven.apache.org/))
+* Gradle 2.1+ ([http://www.gradle.org/](http://www.gradle.org/))
+* MySQL 5.1+ ([http://www.mysql.com/](http://www.mysql.com/))
+* Git 1.8+ ([http://git-scm.com/](http://git-scm.com/))
+* Maven 3.2+ ([http://maven.apache.org/](http://maven.apache.org/))
 
 
 ### Recommended (commonly mandatory on viking projects)
-* Coffeescript ([http://coffeescript.org/](http://coffeescript.org/))
-* MongoDB ([http://www.mongodb.org/](http://www.mongodb.org/))
+* Coffeescript 1.8+ ([http://coffeescript.org/](http://coffeescript.org/))
+* MongoDB 2.4+ ([http://www.mongodb.org/](http://www.mongodb.org/))
 
 #### Additional notes
 ##### MySQL
@@ -186,11 +186,85 @@ Stops Liferay for the active project.
 #### tail-log
 Follows Liferay's tomcat/logs/catalina.out log.
 
-#### update
-Updates templates located in *~/.viking-shell/templates*.
-
 #### use-project
 Set the active project.
+
+#### add-portlet
+Adds a portlet to the active project
+
+Example:
+```
+add-portlet --name Name
+```
+
+#### clean
+Cleans build folders, and tomcat webapps, temp and work if specified
+
+Examples:
+
+To clean *tomcat/webapps/MyPortlet* folder:
+```
+clean --portletsWebapp
+```
+
+To clean portlet's and theme's build folder:
+```
+clean --portletsBuild --themeBuild
+```
+
+To clean everything:
+```
+clean --portletsBuild --portletsWebapp --themeBuild --themeWebapp --tomcatTempAndWork
+```
+
+There's a shorthand for this last one:
+```
+clean --everything
+```
+
+#### init-dev-conf
+Initializes dev.conf file of your portlets project.
+
+#### install-project
+Installs a project from a git repository.
+
+Example:
+```
+install-project --gitRepository git@github.com:digitalgeko/viking-booking-tutorial.git
+```
+
+#### install-shell
+Installs the version specified of viking-shell
+
+Example:
+```
+install-shell --version latest
+```
+
+To install a specific version:
+```
+install-shell --version 0.1.8
+```
+
+#### prod-war
+Builds a WAR file without the dev.conf file, ready to deploy to production.
+
+#### pwd
+Shows project paths.
+
+#### test
+Runs project tests.
+
+Examples:
+```
+test --regex *IntegrationTests
+```
+
+To clean before running tests:
+```
+test --clean
+```
+
 
 # Essential documentation
 
@@ -198,16 +272,24 @@ Set the active project.
 
 |**File path**|**Description**|
 |---------------------------|-------------|--------------|
-|conf/log4j.properties      |log4j configuration file|
-|conf/portlet.conf          |Viking configuration file|
-|public/coffee              |Here you can drop your coffee files, they will be compiled and be available in the WAR js folder when deploying|
-|public/css                 |CSS folder|
-|public/icon.png            |Icon that will be shown in your portlets|
-|public/images              |Images folder|
-|public/js                  |JavaScript files |
-|viking/controllers         |Here you will have your controllers|
-|viking/models              |Here you will have your models|
-|viking/views               |Here you will have your **freemarker** templates|
+|conf/log4j.properties			|log4j configuration file|
+|conf/portlet.conf				|Viking configuration file|
+|conf/dev.conf					|Overrides project.conf variables. This file **SHOULD NOT** be deployed to production.|
+|conf/sitebuilder.conf			|Sitebuilder configuration file|
+|i18n/								|Folder that will contain Language.properties files|
+|public/coffee					|Here you can drop your coffee files, they will be compiled and be available in the WAR js folder when deploying|
+|public/css						|CSS folder|
+|public/icon.png					|Icon that will be shown in your portlets|
+|public/images					|Images folder|
+|public/js						|JavaScript files |
+|resources/						|Project resources |
+|sitebuilder/sites.groovy		|Sitebuilder script file |
+|test/functional					|Folder that will contain functional tests|
+|test/integration				|Folder that will contain integration tests|
+|test/resources					|Tests resources folder|
+|viking/controllers				|Here you will have your controllers|
+|viking/models					|Here you will have your models|
+|viking/views						|Here you will have your **freemarker** templates|
 |viking/views/viking_macros |In this folder you find useful Viking macros that are included on all templates, you can change them if you want :) |
 |.templates                 |If you can't accomplish something with viking configuration, this folder has viking templates for generating source code, you can customize any xml you want in order to meet you specific needs.|
 
@@ -645,7 +727,7 @@ person.delete()
 
 ## Liferay helpers
 
-There's a very useful helper variable named "**h**" that can be used to have quick access to very common variables you use everyday in Liferay, for example:To retrieve request's themeDisplay, you can simply write: 
+There's a very useful helper variable named "**h**" that can be used to have quick access to very common variables you use everyday in Liferay, for example: To retrieve request's themeDisplay, you can simply write: 
 
 ```
     @Render
@@ -662,21 +744,32 @@ ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DI
 
 (Seriously, have you ever done this in a different way?)
 
-Variables available in **h** are:
-
-|**Variable name**|**Class**|
-|-----------------|---------|
-|h.themeDisplay|com.liferay.portal.theme.ThemeDisplay|
-|h.servletRequest|javax.servlet.http.HttpServletRequest|
-|h.locale|java.util.Locale|
-|h.user|com.liferay.portal.model.User|
-|h.portletId|java.lang.String|
-|h.session|javax.portlet.PortletSession|
-|h.contextPath|java.lang.String|
-
 **h** is available in templates as well.
 
+### Variables
+
+Variables available in **h** are:
+
+|**Variable name**				|**Class**|
+|-----------------				|---------|
+|h.themeDisplay					|com.liferay.portal.theme.ThemeDisplay|
+|h.servletRequest				|javax.servlet.http.HttpServletRequest|
+|h.servletResponse				|javax.servlet.http.HttpServletResponse|
+|h.user							|com.liferay.portal.model.User|
+|h.portletId						|java.lang.String|
+|h.session						|javax.portlet.PortletSession|
+|h.contextPath					|java.lang.String|
+|h.portletConfig					|javax.portlet.PortletConfig|
+|h.serviceContext				|com.liferay.portal.service.ServiceContext|
+|h.messages						|nl.viking.i18n.Messages|
+
 Every variable is instantiated the first time you request it, so there are no performance implications.
+
+### Methods
+
+#### - boolean hasPermission(resourceName, actionId, groupId = null, primKey = null)
+
+This method checks if the current user has permissions to apply the action `actionId` to the resource `resourceName`, with an optional `groupId` and `primKey`.
 
 ## Jobs
 
