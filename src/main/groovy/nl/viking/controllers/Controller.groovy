@@ -23,7 +23,7 @@ import javax.portlet.*
  * Time: 3:00 PM
  * To change this template use File | Settings | File Templates.
  */
-class Controller {
+abstract class Controller {
 
     def request
 

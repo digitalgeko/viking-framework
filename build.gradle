@@ -2,12 +2,13 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'idea'
+apply plugin: 'osgi'
 apply plugin: 'sonar-runner'
 
 
 def groupId = 'org.vikingportlets'
 def artifactId = project.name
-def versionNumber = '0.3.0'
+def versionNumber = 'develop'
 
 group = groupId
 version = versionNumber
@@ -20,6 +21,12 @@ targetCompatibility = 1.6
 
 jar {
 	archiveName = "${artifactId}-${version}.jar"
+    manifest {
+        name = 'Viking framework'
+        instruction 'Bundle-Vendor', 'Tible'
+        instruction 'Bundle-Description', 'Viking framework'
+        instruction 'Bundle-DocURL', 'http://www.vikingframework.com'
+    }
 }
 
 repositories {

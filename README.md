@@ -821,6 +821,176 @@ MyPortlet {
 }
 ```
 
+## Tests
+
+We run our tests using **Spock** ([http://spockframework.org](http://spockframework.org)) and **Arquillian** ([http://arquillian.org](http://arquillian.org)), please refer to their docs for further information.
+
+Every viking project has 3 tests directories: `test/integration`, `test/functional` to code your integration and functional tests respectively and `test/resources` to add test resources for both directories.
+
+Every test file should have the following:
+
+ * Must be annotated with **@RunWith(ArquillianSputnik)**
+ * Must extend from **spock.lang.Specification**
+ * Must have a **static** method that returns a **WebArchive**, and must be annotated with **@Deployment**, there's a handy way to do this:
+
+ ```
+ @Deployment
+	def static WebArchive "create deployment"() {
+		ShrinkWrap.createFromZipFile(WebArchive.class, VikingTestDeploymentHelper.warFile)
+	}
+ ```
+ * And of course, must have at least one method with your test
+
+### Examples
+
+#### Integration
+
+The following example validates that there's at least one company in a liferay installation.
+
+```
+import com.liferay.portal.service.CompanyLocalServiceUtil
+import nl.viking.arquillian.deployment.VikingTestDeploymentHelper
+import org.jboss.arquillian.container.test.api.Deployment
+import org.jboss.arquillian.spock.ArquillianSputnik
+import org.jboss.shrinkwrap.api.ShrinkWrap
+import org.jboss.shrinkwrap.api.spec.WebArchive
+import org.junit.runner.RunWith
+import spock.lang.Specification
+import spock.lang.Unroll
+
+@RunWith(ArquillianSputnik)
+class DefaultIntegrationTest extends Specification {
+
+	@Deployment
+	def static WebArchive "create deployment"() {
+		ShrinkWrap.createFromZipFile(WebArchive.class, VikingTestDeploymentHelper.warFile)
+	}
+
+	def "liferay should have at least one company" () {
+		when:
+		def companyCount = CompanyLocalServiceUtil.companiesCount
+
+		then:
+		companyCount > 0
+	}
+
+}
+
+```
+
+#### Functional
+
+The following example requests the liferay login page, and validates that after logging in, the user should be at the user's personal site:
+
+```
+import nl.viking.arquillian.deployment.VikingTestDeploymentHelper
+import org.jboss.arquillian.container.test.api.Deployment
+import org.jboss.arquillian.container.test.api.RunAsClient
+import org.jboss.arquillian.drone.api.annotation.Drone
+import org.jboss.arquillian.graphene.Graphene
+import org.jboss.arquillian.spock.ArquillianSputnik
+import org.jboss.shrinkwrap.api.ShrinkWrap
+import org.jboss.shrinkwrap.api.spec.WebArchive
+import org.junit.runner.RunWith
+import org.openqa.selenium.WebDriver
+import pageobject.LoginPage
+import spock.lang.Specification
+
+@RunWith(ArquillianSputnik)
+class DefaultFunctionalTest extends Specification {
+
+	@Deployment
+	def static WebArchive "create deployment"() {
+		ShrinkWrap.createFromZipFile(WebArchive.class, VikingTestDeploymentHelper.warFile)
+	}
+
+	@Drone
+	WebDriver driver;
+
+	@RunAsClient
+	def "liferay is running" () {
+
+		expect:
+		def loginPage = Graphene.goTo(LoginPage)
+		loginPage.login(email, pass)
+
+		driver.currentUrl.toURI().path == "/user/$username/home"
+
+		where:
+		email 				| pass 		| username
+		"test@liferay.com"	| "test"	| "test"
+
+	}
+
+}
+
+```
+
+The WebDriver, as you see, is injected. By default, we use **firefox**, but you can change by modifying the file `test/resources/arquillian.xml`. For example, to use phantomjs, your arquillian.xml should look like:
+
+```
+<?xml version="1.0"?>
+<arquillian
+		xmlns="http://jboss.org/schema/arquillian"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
+		>
+	<container qualifier="tomcat" default="true">
+		<configuration>
+			<property name="jmxPort">8099</property>
+			<property name="pass">tomcat</property>
+			<property name="user">tomcat</property>
+		</configuration>
+	</container>
+
+	<extension qualifier="webdriver">
+		<property name="browser">phantomjs</property>
+	</extension>
+</arquillian>
+```
+
+The important line here is `<property name="browser">phantomjs</property>`
+
+Also, there's a pageobject.LoginPage class, this class is located inside `test/functional/pageobject` and looks like this:
+
+```
+package pageobject
+
+import org.jboss.arquillian.graphene.Graphene
+import org.jboss.arquillian.graphene.findby.FindByJQuery
+import org.jboss.arquillian.graphene.page.Location
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
+
+@Location("/c/portal/login")
+class LoginPage {
+
+	@FindBy(id = "_58_login")
+	private WebElement userName;
+
+	@FindBy(id = "_58_password")
+	private WebElement password;
+
+	@FindByJQuery(".button-holder > .btn.btn-primary")
+	private WebElement loginButton;
+
+	void login(String u, String p) {
+		this.userName.sendKeys(u)
+		this.password.sendKeys(p)
+		Graphene.guardHttp(loginButton).click()
+	}
+}
+```
+
+The class **pageobject.LoginPage** uses Graphene's pageobject approach.
+
+To read more about Graphene, Drone and integration with Arquillian, follow this URL: [http://arquillian.org/guides/functional_testing_using_graphene](http://arquillian.org/guides/functional_testing_using_graphene)
+
+### Running tests
+To run the tests just execute the `test` viking shell command:
+```
+MyProject> test
+```
 
 
 ## Site builder

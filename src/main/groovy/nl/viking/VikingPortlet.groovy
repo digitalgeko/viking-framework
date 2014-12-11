@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest
 
 class VikingPortlet extends GenericPortlet
 {
-	private String defaultControllerName
+	protected String defaultControllerName
 
 	public static final ThreadLocal<Controller> controllerThreadLocal = new ThreadLocal();
 
