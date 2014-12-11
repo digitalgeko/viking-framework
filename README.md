@@ -1,4 +1,4 @@
-# Viking Framework		
+# Viking Framework
 		
 Viking is an Open Source Portlet development framework for [Liferay](http://www.liferay.com).  It takes advantage of the groovy language and introduces convention over configuration to the Liferay ecosystem.		
 Our goal is to provide portlet developers with a modern and agile true MVC framework that speeds up the development process. 	
@@ -16,6 +16,8 @@ Main technologies used:
 * Freemarker
 
 # Table of contents
+* [Viking Framework](#viking-framework)
+* [Table of contents](#table-of-contents)
 * [Getting started](#getting-started)
  * [Prerequisites](#prerequisites)
  * [Installation](#installation)
@@ -31,8 +33,8 @@ Main technologies used:
  * [Models](#models)
  * [Liferay helpers](#liferay-helpers)
  * [Jobs](#jobs)
+ * [Tests](#tests)
  * [Site builder](#site-builder)
-
 
 # Getting started
 ## Prerequisites
