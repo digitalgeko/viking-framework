@@ -29,13 +29,6 @@ jar {
     }
 }
 
-task jarWithDeps(type: Jar) {
-    
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-
 repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
     maven { url "http://repo1.maven.org/maven2/com/fasterxml/jackson/" }
@@ -119,29 +112,3 @@ uploadArchives {
         }
     }
 }   
-
-
-
-task wab(type:Jar){
-    manifest = osgiManifest {
-        classesDir = project.sourceSets.main.output.classesDir
-        classpath = project.configurations.runtime
-
-        name = 'Viking framework'
-        instruction 'Bundle-Vendor', 'Tible'
-        instruction 'Bundle-Description', 'Viking framework'
-        instruction 'Bundle-DocURL', 'http://www.vikingframework.com'
-        instruction 'Bundle-ClassPath', "classes,${configurations.runtime.collect { "lib/$it.name" }.join(",")}"
-        instruction 'Import-Package', 'com.liferay.portal,javax.portlet,javax.servlet,com.liferay.portal.util,com.liferay.portlet,com.liferay.portal.kernel.portlet,nl.viking.logging'
-        instruction 'Export-Package', 'nl.viking,nl.viking.arquillian.deployment,nl.viking.controllers,nl.viking.controllers.annotation,nl.viking.controllers.response,nl.viking.controllers.router,nl.viking.data.binding,nl.viking.data.validation,nl.viking.db,nl.viking.db.hibernate.strategy,nl.viking.enhancers,nl.viking.i18n,nl.viking.listeners,nl.viking.logging,nl.viking.model.annotation,nl.viking.model.gmongo,nl.viking.model.gmongo.annotation,nl.viking.model.hibernate,nl.viking.model.indexer,nl.viking.model.internal,nl.viking.model.internal.hibernate,nl.viking.model.liferay.asset,nl.viking.model.liferay.asset.renderer,nl.viking.model.liferay.socialactivity,nl.viking.model.liferay.workflow,nl.viking.model.morphia,nl.viking.utils'
-        instruction 'DynamicImport-Package', "*"
-    }
-
-    def classpath = project.configurations.runtime
-    into('classes') {
-        from sourceSets.main.output
-    }
-    into('lib') {
-        from configurations.runtime
-    }
-}
