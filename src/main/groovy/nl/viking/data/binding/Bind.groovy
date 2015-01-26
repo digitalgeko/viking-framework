@@ -23,30 +23,33 @@ class Bind {
 
 	Validator validator
 
-	def request
+	private def request
 
 	static <T> T fromRequest(String paramName, request, Class<T> clazz, Class listClass = null, T targetObject = null) {
 		new Bind(request: request).bind(paramName, clazz, listClass, targetObject)
 	}
 
-	def getUploadRequest() {
-		if (Conf.properties.allowParametersWithoutPrefix && request.method.equalsIgnoreCase("POST")) {
-			return request
+	void setRequest(request) {
+		if (!Conf.properties.allowParametersWithoutPrefix || !request.method.equalsIgnoreCase("POST")) {
+			if (PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
+				this.request = PortalUtil.getUploadPortletRequest(request)
+			}
 		}
 
-		if (!PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
-			throw new Exception("Form request is not multipart/form-data, add [enctype='multipart/form-data'] attribute to your HTML form")
+		if (!this.request) {
+			this.request = request
 		}
-		return PortalUtil.getUploadPortletRequest(request)
 	}
 
 	def <T> T bind(String paramName, Class<T> clazz, Class listClass = null, T targetObject = null) {
         if (File.class.isAssignableFrom(clazz)) {
-			def uploadRequest = getUploadRequest()
-            return uploadRequest.getFile(paramName)
+			if (listClass) {
+				return request.getFiles(paramName)
+			} else {
+				return request.getFile(paramName)
+			}
         } else if (Blob.class.isAssignableFrom(clazz)){
-			def uploadRequest = getUploadRequest()
-			return Blob.create(uploadRequest.getFile(paramName), uploadRequest.getFileName(paramName))
+			return Blob.create(request.getFile(paramName), request.getFileName(paramName))
         } else {
             def values = request.getParameterValues(paramName)
             if (values && values.size() > 0) {

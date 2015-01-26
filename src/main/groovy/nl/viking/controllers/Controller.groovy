@@ -201,6 +201,14 @@ abstract class Controller {
         bind(parameterName, File.class, defaultValue)
     }
 
+	def List bindFiles (String parameterName, List defaultValue = null) {
+		def obj = binder.bind(parameterName, File.class, List.class)
+		if (obj == null) {
+			return defaultValue
+		}
+		return obj
+	}
+
 	def <T> T bindJsonBody (Class<T> clazz = Object.class) {
 		binder.fromJsonBody(clazz)
 	}
