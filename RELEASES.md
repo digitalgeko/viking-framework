@@ -1,5 +1,32 @@
 # Release notes
 
+## 0.3.1
+
+* Added Bootstrap listener to use with web.xml (in order to init viking when running arquillian tests)
+* Controllers are now abstract classes
+* Added `bindFiles` controller function.
+* Package refactoring.
+
+### Migration guide
+* Change your portlets project build.gradle line to use viking-framework 0.3.1:
+```
+compile 'org.vikingportlets:viking-framework:0.3.1'
+```
+
+* Edit `.templates/web.xml`, add inside the tag `<web-app>`:
+```
+<listener>
+		<listener-class>nl.viking.listeners.BootstrapListener</listener-class>
+	</listener>
+```
+* Edit `.templates/conf/liferay-portlet.xml`, change the package of `VikingActivityInterpreter` to **nl.viking.model.liferay.socialactivity.VikingActivityInterpreter**. It will look like this:
+```
+<social-activity-interpreter-class>
+                nl.viking.model.liferay.socialactivity.VikingActivityInterpreter
+</social-activity-interpreter-class>
+```
+
+
 ## 0.3.0
 
 ### Hibernate
