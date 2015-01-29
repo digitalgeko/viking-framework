@@ -1,10 +1,18 @@
 package nl.viking.controllers
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil
 import com.liferay.portal.kernel.servlet.HttpHeaders
 import com.liferay.portal.kernel.util.MimeTypesUtil
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil
+import com.liferay.portlet.asset.model.AssetTag
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil
 import com.mongodb.gridfs.GridFSDBFile
 import nl.viking.Conf
 import nl.viking.VikingPortlet
+import nl.viking.controllers.annotation.Resource
 import nl.viking.controllers.response.DoNothing
 import nl.viking.controllers.response.Redirect
 import nl.viking.controllers.router.Router
@@ -129,9 +137,13 @@ abstract class Controller {
     def render(String viewTemplate, LinkedHashMap data = []) {
         if (!viewTemplate) viewTemplate = this.viewTemplate
 
-		if (data.angularData) {
-			data.angularData = toJson(data.angularData)
+		if (!data.angularData) {
+			data.angularData = [:]
 		}
+		data.angularData.VIKING_FRAMEWORK_PARAMS = [
+				controllerName: this.class.name
+		]
+		data.angularData = toJson(data.angularData)
 
         if (validator.errors.size() > 0) {
             data << [vikingErrors: validator.errors]
@@ -258,5 +270,25 @@ abstract class Controller {
 
 	def getTemplatesFolder() {
 		return this.class.simpleName
+	}
+
+
+	// Default methods
+
+	@Resource(mode="view")
+	def getTags() {
+		def params = bindJsonBody()
+		final DynamicQuery tagsQuery = DynamicQueryFactoryUtil.forClass(AssetTag.class, PortalClassLoaderUtil.classLoader)
+		tagsQuery.add(PropertyFactoryUtil.forName("name").like(params.query+"%"))
+		if (h.user) {
+			tagsQuery.add(PropertyFactoryUtil.forName("groupId").in(h.user.groupIds))
+		} else {
+			tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
+		}
+
+		tagsQuery.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("name")))
+		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {[text: it]}
+
+		renderJSON(tags)
 	}
 }
