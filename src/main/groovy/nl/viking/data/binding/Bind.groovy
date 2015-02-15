@@ -12,6 +12,8 @@ import org.codehaus.jackson.annotate.JsonMethod
 import org.codehaus.jackson.map.DeserializationConfig
 import org.codehaus.jackson.map.ObjectMapper
 
+import javax.portlet.PortletRequest
+
 /**
  * Created with IntelliJ IDEA.
  * User: mardo
@@ -31,7 +33,7 @@ class Bind {
 
 	void setRequest(request) {
 		if (!Conf.properties.allowParametersWithoutPrefix || !request.method.equalsIgnoreCase("POST")) {
-			if (PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
+			if (request instanceof PortletRequest && PortalUtil.isMultipartRequest(PortalUtil.getHttpServletRequest(request))) {
 				this.request = PortalUtil.getUploadPortletRequest(request)
 			}
 		}
