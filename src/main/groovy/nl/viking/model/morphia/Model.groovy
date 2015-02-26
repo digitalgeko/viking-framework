@@ -6,6 +6,7 @@ import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
 import nl.viking.model.annotation.Asset
 import nl.viking.model.annotation.Searchable
+import nl.viking.model.annotation.SearchableField
 import nl.viking.model.annotation.SocialActivity
 import nl.viking.model.liferay.asset.AssetInfo
 import nl.viking.model.liferay.socialactivity.SocialActivityInfo
@@ -35,8 +36,10 @@ class Model implements Comparable<Model> {
 
     private long _updated
 
+    @SearchableField
 	Long groupId
 
+    @SearchableField
 	Long companyId
 
 	@Transient @JsonIgnore

@@ -1,10 +1,19 @@
 package nl.viking.controllers
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil
 import com.liferay.portal.kernel.servlet.HttpHeaders
 import com.liferay.portal.kernel.util.MimeTypesUtil
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil
+import com.liferay.portlet.asset.model.AssetTag
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil
 import com.mongodb.gridfs.GridFSDBFile
 import nl.viking.Conf
+import nl.viking.DateSerializer
 import nl.viking.VikingPortlet
+import nl.viking.controllers.annotation.Resource
 import nl.viking.controllers.response.DoNothing
 import nl.viking.controllers.response.Redirect
 import nl.viking.controllers.router.Router
@@ -12,9 +21,14 @@ import nl.viking.data.binding.Bind
 import nl.viking.data.validation.Validator
 import nl.viking.utils.TemplateUtils
 import org.apache.commons.io.IOUtils
+import org.codehaus.jackson.Version
 import org.codehaus.jackson.map.ObjectMapper
+import org.codehaus.jackson.map.SerializationConfig
+import org.codehaus.jackson.map.module.SimpleModule
+import org.codehaus.jackson.map.util.ISO8601DateFormat
 
 import javax.portlet.*
+import java.text.SimpleDateFormat
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,7 +67,11 @@ abstract class Controller {
 		this.validator = new Validator(getH())
 		this.binder = new Bind(validator: this.validator, request: this.request)
 		this.json = new ObjectMapper()
-	}
+        this.json.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+        final SimpleModule jsonModule = new SimpleModule("viking", Version.unknownVersion());
+        jsonModule.addSerializer(Date.class, new DateSerializer())
+        this.json.registerModule(jsonModule)
+    }
 
 	void setResponse(def response) {
         this.response = response
@@ -129,9 +147,13 @@ abstract class Controller {
     def render(String viewTemplate, LinkedHashMap data = []) {
         if (!viewTemplate) viewTemplate = this.viewTemplate
 
-		if (data.angularData) {
-			data.angularData = toJson(data.angularData)
+		if (!data.angularData) {
+			data.angularData = [:]
 		}
+		data.angularData.VIKING_FRAMEWORK_PARAMS = [
+				controllerName: this.class.name
+		]
+		data.angularData = toJson(data.angularData)
 
         if (validator.errors.size() > 0) {
             data << [vikingErrors: validator.errors]
@@ -258,5 +280,26 @@ abstract class Controller {
 
 	def getTemplatesFolder() {
 		return this.class.simpleName
+	}
+
+
+	// Default methods
+
+	@Resource(mode="view")
+	def getTags() {
+		def params = bindJsonBody()
+		final DynamicQuery tagsQuery = DynamicQueryFactoryUtil.forClass(AssetTag.class, PortalClassLoaderUtil.classLoader)
+		tagsQuery.add(PropertyFactoryUtil.forName("name").like(params.query+"%"))
+        tagsQuery.add(PropertyFactoryUtil.forName("companyId").eq(h.themeDisplay.companyId))
+		if (h.user) {
+			tagsQuery.add(PropertyFactoryUtil.forName("groupId").in(h.user.groupIds))
+		} else {
+			tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
+		}
+
+		tagsQuery.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("name")))
+		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {[text: it]}
+
+		renderJSON(tags)
 	}
 }

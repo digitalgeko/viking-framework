@@ -34,7 +34,7 @@ class Router {
         def routeArray = route.split("\\.")
         def controller = Class.forName("${controllerPackage(request)}.${routeArray[0]}")
         def action = routeArray[1]
-        def method = controller.getDeclaredMethod(action)
+        def method = controller.getMethod(action)
 
 		PortletMode portletMode
 		if (action == "view") {

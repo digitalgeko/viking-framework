@@ -3,6 +3,7 @@ package nl.viking.model.indexer
 import com.liferay.portal.kernel.search.*
 import com.liferay.portal.util.PortalUtil
 import groovy.text.SimpleTemplateEngine
+import nl.viking.controllers.Controller
 import nl.viking.logging.Logger
 import nl.viking.model.annotation.Asset
 import nl.viking.utils.TemplateUtils
@@ -19,8 +20,6 @@ class VikingModelIndexer extends BaseIndexer {
 
 	Class modelClass
 
-	Long companyId = PortalUtil.defaultCompanyId
-
 	String portletId
 
 	List searchableFields
@@ -28,6 +27,14 @@ class VikingModelIndexer extends BaseIndexer {
 	public static final MODEL_CLASS_NAME = "modelClassName"
 
 	public static final MODEL_ID = "modelId"
+
+    Long getCompanyId () {
+        def h = Controller.currentDataHelper
+        if (h) {
+            return h.themeDisplay.companyId
+        }
+        PortalUtil.defaultCompanyId
+    }
 
 	VikingModelIndexer(Class modelClass, String portletId, List searchableFields) {
 		this.modelClass = modelClass
@@ -76,7 +83,9 @@ class VikingModelIndexer extends BaseIndexer {
 				document.addKeyword(it.name, o[it.propName].toString().toLowerCase())
 			} else {
 				try {
-					document."add${type.capitalize()}"(it.name, o[it.propName])
+                    if (o[it.propName] != null) {
+                        document."add${type.capitalize()}"(it.name, o[it.propName])
+                    }
 				} catch (e) {
 					Logger.error("Field $it.propName could not be set using document.add${type.capitalize()}(${it.name}, ${o[it.propName]})")
 					throw e
@@ -162,7 +171,7 @@ class VikingModelIndexer extends BaseIndexer {
 	@Override
 	void postProcessSearchQuery(BooleanQuery searchQuery, SearchContext searchContext) throws Exception {
 		searchableFields.each {
-			addSearchTerm(searchQuery, searchContext, it.name, it.searchableFieldAnnotation.like());
+			addSearchTerm(searchQuery, searchContext, it.name, it.searchableFieldAnnotation.like())
 		}
 	}
 }
