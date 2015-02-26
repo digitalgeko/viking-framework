@@ -41,13 +41,10 @@ class HibernateFactory {
 			cfg.setProperty("hibernate.connection.url", PropsUtil.get("jdbc.default.url"))
 			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
 			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
+            cfg.setProperty("hibernate.ejb.naming_strategy", "nl.viking.db.hibernate.strategy.VikingNamingStrategy")
 
 //			cfg.setProperty("hibernate.current_session_context_class", "thread")
 			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
-
-			if (Conf.properties.hibernate.prefix) {
-				cfg.setNamingStrategy(new VikingNamingStrategy())
-			}
 
 			Conf.properties.hibernate.flatten().each {
 				cfg.setProperty("hibernate."+it.key, it.value)

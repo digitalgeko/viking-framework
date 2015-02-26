@@ -184,24 +184,36 @@ class Bind {
 	static fromJson(String jsonText, Class clazz, boolean retrieveModelById = true) {
 		ObjectMapper mapper = new ObjectMapper().setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
 		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		def tempObj = mapper.readValue(jsonText, clazz)
 
-		def targetObject
-		Map json = new JsonSlurper().parseText(jsonText)
-		if (retrieveModelById && isModel(clazz) && json.id) {
-			targetObject = clazz.findById(json.id)
-			targetObject.properties.findAll {!['id', "_id", "created", "updated", "class"].contains(it.key)}.each {
-				if (json.containsKey(it.key)) {
-					try {
-						targetObject[it.key] = tempObj[it.key]
-					} catch (ReadOnlyPropertyException e) {
-						Logger.warn("Could not bind property $it.key because is read-only.")
-					}
-				}
-			}
-		} else {
-			targetObject = tempObj
-		}
-		targetObject
+        def tempObj = mapper.readValue(jsonText, clazz)
+        Map json = new JsonSlurper().parseText(jsonText)
+
+        fromObject(json, tempObj, clazz, retrieveModelById)
 	}
+
+    static fromObject(map, tempObj, Class clazz, boolean retrieveModelById = true) {
+
+        def targetObject
+        if (retrieveModelById && isModel(clazz) && map.id) {
+            targetObject = clazz.findById(map.id)
+            targetObject.properties.findAll {!['id', "_id", "created", "updated", "class"].contains(it.key)}.each {
+                if (map.containsKey(it.key)) {
+                    try {
+                        def field = clazz.declaredFields.find { field -> field.name == it.key }
+                        if (tempObj[it.key] != null && field && isModel(field.type)) {
+                            targetObject[it.key] = fromObject(tempObj[it.key].properties, tempObj[it.key], field.type, retrieveModelById)
+                        } else {
+                            targetObject[it.key] = tempObj[it.key]
+                        }
+
+                    } catch (ReadOnlyPropertyException e) {
+                        Logger.warn("Could not bind property $it.key because is read-only.")
+                    }
+                }
+            }
+        } else {
+            targetObject = tempObj
+        }
+        targetObject
+    }
 }

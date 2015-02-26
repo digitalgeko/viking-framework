@@ -11,6 +11,7 @@ import com.liferay.portlet.asset.model.AssetTag
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil
 import com.mongodb.gridfs.GridFSDBFile
 import nl.viking.Conf
+import nl.viking.DateSerializer
 import nl.viking.VikingPortlet
 import nl.viking.controllers.annotation.Resource
 import nl.viking.controllers.response.DoNothing
@@ -20,9 +21,14 @@ import nl.viking.data.binding.Bind
 import nl.viking.data.validation.Validator
 import nl.viking.utils.TemplateUtils
 import org.apache.commons.io.IOUtils
+import org.codehaus.jackson.Version
 import org.codehaus.jackson.map.ObjectMapper
+import org.codehaus.jackson.map.SerializationConfig
+import org.codehaus.jackson.map.module.SimpleModule
+import org.codehaus.jackson.map.util.ISO8601DateFormat
 
 import javax.portlet.*
+import java.text.SimpleDateFormat
 
 /**
  * Created with IntelliJ IDEA.
@@ -61,7 +67,11 @@ abstract class Controller {
 		this.validator = new Validator(getH())
 		this.binder = new Bind(validator: this.validator, request: this.request)
 		this.json = new ObjectMapper()
-	}
+        this.json.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+        final SimpleModule jsonModule = new SimpleModule("viking", Version.unknownVersion());
+        jsonModule.addSerializer(Date.class, new DateSerializer())
+        this.json.registerModule(jsonModule)
+    }
 
 	void setResponse(def response) {
         this.response = response
@@ -280,6 +290,7 @@ abstract class Controller {
 		def params = bindJsonBody()
 		final DynamicQuery tagsQuery = DynamicQueryFactoryUtil.forClass(AssetTag.class, PortalClassLoaderUtil.classLoader)
 		tagsQuery.add(PropertyFactoryUtil.forName("name").like(params.query+"%"))
+        tagsQuery.add(PropertyFactoryUtil.forName("companyId").eq(h.themeDisplay.companyId))
 		if (h.user) {
 			tagsQuery.add(PropertyFactoryUtil.forName("groupId").in(h.user.groupIds))
 		} else {

@@ -13,7 +13,12 @@ import org.hibernate.cfg.ImprovedNamingStrategy
 class VikingNamingStrategy extends ImprovedNamingStrategy {
 	private static final long serialVersionUID = 1L;
 
-	@Override
+    @Override
+    String tableName(String tableName) {
+        return this.addPrefix(super.tableName(tableName))
+    }
+
+    @Override
 	public String classToTableName(final String className) {
 		return this.addPrefix(super.classToTableName(className));
 	}
@@ -34,6 +39,8 @@ class VikingNamingStrategy extends ImprovedNamingStrategy {
 		return this.addPrefix(super.logicalCollectionTableName(tableName,
 				ownerEntityTable, associatedEntityTable, propertyName));
 	}
+
+    
 
 	private String addPrefix(final String composedTableName) {
 		String prefix = Conf.properties.hibernate.prefix != null ? Conf.properties.hibernate.prefix : "vk_"
