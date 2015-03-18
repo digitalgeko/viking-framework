@@ -291,14 +291,9 @@ abstract class Controller {
 		final DynamicQuery tagsQuery = DynamicQueryFactoryUtil.forClass(AssetTag.class, PortalClassLoaderUtil.classLoader)
 		tagsQuery.add(PropertyFactoryUtil.forName("name").like(params.query+"%"))
         tagsQuery.add(PropertyFactoryUtil.forName("companyId").eq(h.themeDisplay.companyId))
-		if (h.user) {
-			tagsQuery.add(PropertyFactoryUtil.forName("groupId").in(h.user.groupIds))
-		} else {
-			tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
-		}
+        tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
 
-		tagsQuery.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("name")))
-		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {[text: it]}
+		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {AssetTag tag -> [text: tag.name, tagId: tag.tagId]}
 
 		renderJSON(tags)
 	}

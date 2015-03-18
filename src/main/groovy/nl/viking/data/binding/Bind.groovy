@@ -5,6 +5,7 @@ import com.liferay.portal.util.PortalUtil
 import groovy.json.JsonSlurper
 import nl.viking.Conf
 import nl.viking.data.validation.Validator
+import nl.viking.db.HibernateFactory
 import nl.viking.logging.Logger
 import nl.viking.model.morphia.Blob
 import org.codehaus.jackson.annotate.JsonAutoDetect
