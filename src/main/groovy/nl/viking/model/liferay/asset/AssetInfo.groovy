@@ -74,6 +74,7 @@ class AssetInfo {
 			this.classPK = model.id
 			this.classUuid = model.id.toString()
 		}
+        this.groupId = model.groupId
 		fill(Controller.currentDataHelper)
 	}
 
@@ -83,6 +84,7 @@ class AssetInfo {
 			this.classPK = MongoUtils.objectIdToLong(model._id)
 			this.classUuid = model.id
 		}
+        this.groupId = model.groupId
 		fill(Controller.currentDataHelper)
 	}
 

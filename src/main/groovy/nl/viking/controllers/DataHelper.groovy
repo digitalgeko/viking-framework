@@ -49,10 +49,13 @@ class DataHelper {
 
 	ServiceContext serviceContext
 
-	DataHelper(request, response, portletRequest) {
+    Class controllerClass
+
+	DataHelper(request, response, portletRequest, Class controllerClass) {
 		this.request = request
 		this.response = response
 		this.portletRequest = portletRequest
+        this.controllerClass = controllerClass
 	}
 
 	Messages getMessages() {

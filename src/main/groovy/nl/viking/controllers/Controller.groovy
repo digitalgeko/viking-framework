@@ -82,7 +82,7 @@ abstract class Controller {
 
     DataHelper getH() {
         if (h == null) {
-			h = new DataHelper(request, response, portletRequest)
+			h = new DataHelper(request, response, portletRequest, this.class)
         }
         return h
     }

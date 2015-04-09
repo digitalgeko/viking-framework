@@ -1,6 +1,7 @@
 package nl.viking
 
 import com.liferay.portal.util.PortalUtil
+import groovy.transform.Synchronized
 import nl.viking.controllers.Controller
 import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render
@@ -27,6 +28,8 @@ class VikingPortlet extends GenericPortlet
 
 	public boolean isDevEnabled = false
 
+    public boolean appInit = false
+
 	static Controller getCurrentController() {
 		controllerThreadLocal.get()
 	}
@@ -35,26 +38,34 @@ class VikingPortlet extends GenericPortlet
 		servletContextThreadLocal.get()
 	}
 
-	@PostConstruct
-	def void init() {
-		Logger.info("Initializing %s...", getPortletName())
-		if (!defaultControllerName) {
-			def reflections = new Reflections("controllers")
-			Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
-			defaultControllerName = controllers.find{
-				if (it) {
-					return it.simpleName.toLowerCase() == getPortletName()
-				}
-				return false
-			}.name
-		}
-		isDevEnabled = Conf.properties.dev.enabled
-		if (isDevEnabled) {
-			Logger.info("Running viking on DEV mode!")
-		}
-	}
 
-	def loadDevController(controllerName) {
+    @Override @Synchronized
+    void init() throws PortletException {
+        super.init()
+
+        Logger.info("Initializing %s...", getPortletName())
+        if (!appInit) {
+            appInit = true
+
+            if (!defaultControllerName) {
+                def reflections = new Reflections("controllers")
+                Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
+                defaultControllerName = controllers.find{
+                    if (it) {
+                        return it.simpleName.toLowerCase() == getPortletName()
+                    }
+                    return false
+                }.name
+            }
+            isDevEnabled = Conf.properties.dev.enabled
+            if (isDevEnabled) {
+                Logger.info("Running viking on DEV mode!")
+            }
+        }
+
+    }
+
+    def loadDevController(controllerName) {
 		def cl = new GroovyClassLoader(this.class.classLoader) {
 			@Override
 			protected void setClassCacheEntry(Class cls) {
