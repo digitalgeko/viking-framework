@@ -1,6 +1,8 @@
 package nl.viking.model.liferay.asset
 
 import com.liferay.portal.kernel.util.StringPool
+import com.liferay.portlet.asset.NoSuchEntryException
+import com.liferay.portlet.asset.model.AssetEntry
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil
 import nl.viking.controllers.Controller
 import nl.viking.controllers.DataHelper
@@ -65,7 +67,7 @@ class AssetInfo {
 	boolean sync = false
 
 	AssetInfo() {
-		fill(Controller.currentDataHelper)
+        fill()
 	}
 
 	AssetInfo(Model model) {
@@ -75,7 +77,7 @@ class AssetInfo {
 			this.classUuid = model.id.toString()
 		}
         this.groupId = model.groupId
-		fill(Controller.currentDataHelper)
+        fill()
 	}
 
 	AssetInfo(nl.viking.model.morphia.Model model) {
@@ -85,10 +87,20 @@ class AssetInfo {
 			this.classUuid = model.id
 		}
         this.groupId = model.groupId
-		fill(Controller.currentDataHelper)
+
+        fill()
 	}
 
-	def fill(DataHelper h) {
+    def fill() {
+        def assetEntry = getAssetEntry()
+        if (assetEntry) {
+            fillWithAssetEntry(assetEntry)
+        }else{
+            fillWithH(Controller.currentDataHelper)
+        }
+    }
+
+	def fillWithH(DataHelper h) {
 		if (h) {
 			if (h.user) {
 				userId = userId ?: h.user.userId
@@ -97,8 +109,43 @@ class AssetInfo {
 		}
 	}
 
+    def getAssetEntry() {
+        try {
+            return AssetEntryLocalServiceUtil.getEntry(className, classPK)
+        } catch (NoSuchEntryException e) {
+            return null
+        }
+    }
+
+    def fillWithAssetEntry(AssetEntry assetEntry) {
+        this.userId = assetEntry.userId
+        this.groupId = assetEntry.groupId
+        this.className = assetEntry.className
+        this.classPK = assetEntry.classPK
+        this.classUuid = assetEntry.classUuid
+        this.classTypeId = assetEntry.classTypeId
+        this.categoryIds = assetEntry.categoryIds
+        this.tagNames = assetEntry.tagNames
+        this.visible = assetEntry.visible
+        this.createDate = assetEntry.createDate
+        this.modifiedDate = assetEntry.modifiedDate
+        this.startDate = assetEntry.startDate
+        this.endDate = assetEntry.endDate
+        this.publishDate = assetEntry.publishDate
+        this.expirationDate = assetEntry.expirationDate
+        this.mimeType = assetEntry.mimeType
+        this.title = assetEntry.title
+        this.description = assetEntry.description
+        this.summary = assetEntry.summary
+        this.url = assetEntry.url
+        this.layoutUuid = assetEntry.layoutUuid
+        this.height = assetEntry.height
+        this.width = assetEntry.width
+        this.priority = assetEntry.priority
+    }
+
 	def register() {
-		fill(Controller.currentDataHelper)
+		fillWithH(Controller.currentDataHelper)
 		AssetEntryLocalServiceUtil.updateEntry(userId, groupId, createDate, modifiedDate, className, classPK, classUuid, classTypeId, categoryIds, tagNames, visible, startDate, endDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, sync)
 	}
 

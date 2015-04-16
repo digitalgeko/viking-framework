@@ -1,6 +1,7 @@
 package nl.viking.model.morphia
 
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
+import com.liferay.portlet.asset.model.AssetEntry
 import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
