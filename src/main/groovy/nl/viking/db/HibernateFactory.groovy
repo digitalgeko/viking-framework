@@ -1,5 +1,6 @@
 package nl.viking.db
 
+import com.liferay.portal.kernel.dao.jdbc.DataAccess
 import com.liferay.portal.kernel.util.PropsUtil
 import groovy.transform.Synchronized
 import nl.viking.Conf
@@ -12,11 +13,17 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
 
+import javax.naming.Context
+import javax.naming.InitialContext
+import javax.naming.NameClassPair
+import javax.naming.NamingEnumeration
 import javax.persistence.Entity
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 /**
  * Created with IntelliJ IDEA.
  * User: mardo
@@ -36,15 +43,20 @@ class HibernateFactory {
 
 	synchronized static EntityManagerFactory getEntityManagerFactory() {
 		if (entityManagerFactory == null) {
-			// Defaults
-			cfg.setProperty("hibernate.connection.driver_class", PropsUtil.get("jdbc.default.driverClassName"))
-			cfg.setProperty("hibernate.connection.url", PropsUtil.get("jdbc.default.url"))
-			cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
-			cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
+
+            if ((PropsUtil.contains("jdbc.default.jndi.name") || Conf.properties.hibernate.connection.datasource) && !Conf.properties.hibernate.connection.url) {
+                cfg.setProperty("hibernate.connection.datasource", "java:/comp/env/" + PropsUtil.get("jdbc.default.jndi.name"))
+            } else {
+                cfg.setProperty("hibernate.connection.driver_class", PropsUtil.get("jdbc.default.driverClassName"))
+                cfg.setProperty("hibernate.connection.url", PropsUtil.get("jdbc.default.url"))
+                cfg.setProperty("hibernate.connection.username", PropsUtil.get("jdbc.default.username"))
+                cfg.setProperty("hibernate.connection.password", PropsUtil.get("jdbc.default.password"))
+                cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
+            }
+
             cfg.setProperty("hibernate.ejb.naming_strategy", "nl.viking.db.hibernate.strategy.VikingNamingStrategy")
 
 //			cfg.setProperty("hibernate.current_session_context_class", "thread")
-			cfg.setProperty(Environment.CONNECTION_PROVIDER, "com.zaxxer.hikari.hibernate.HikariConnectionProvider")
 
 			Conf.properties.hibernate.flatten().each {
 				cfg.setProperty("hibernate."+it.key, it.value)
