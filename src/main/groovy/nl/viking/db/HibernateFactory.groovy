@@ -1,10 +1,8 @@
 package nl.viking.db
 
-import com.liferay.portal.kernel.dao.jdbc.DataAccess
 import com.liferay.portal.kernel.util.PropsUtil
 import groovy.transform.Synchronized
 import nl.viking.Conf
-import nl.viking.VikingPortlet
 import nl.viking.db.hibernate.strategy.VikingNamingStrategy
 import nl.viking.logging.Logger
 import nl.viking.utils.ReflectionUtils
@@ -13,17 +11,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
 
-import javax.naming.Context
-import javax.naming.InitialContext
-import javax.naming.NameClassPair
-import javax.naming.NamingEnumeration
 import javax.persistence.Entity
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 /**
  * Created with IntelliJ IDEA.
  * User: mardo

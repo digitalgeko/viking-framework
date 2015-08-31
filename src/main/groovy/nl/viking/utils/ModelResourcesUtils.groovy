@@ -4,7 +4,6 @@ import com.liferay.portal.security.permission.ResourceActionsUtil
 import groovy.text.SimpleTemplateEngine
 import nl.viking.model.annotation.ModelResource
 
-import javax.portlet.PortletContext
 import javax.servlet.ServletContext
 
 /**

@@ -7,13 +7,11 @@ import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render
 import nl.viking.controllers.annotation.Resource
 import nl.viking.db.HibernateFactory
-import nl.viking.enhancers.ModelEnhancer
 import nl.viking.logging.Logger
-import nl.viking.utils.*
+import nl.viking.utils.RenderUtils
+import nl.viking.utils.TemplateUtils
 import org.reflections.Reflections
 
-import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
 import javax.portlet.*
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpServletRequest

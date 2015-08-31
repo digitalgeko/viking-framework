@@ -2,7 +2,6 @@ package nl.viking.controllers
 
 import com.liferay.portal.kernel.dao.orm.DynamicQuery
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil
-import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil
 import com.liferay.portal.kernel.servlet.HttpHeaders
 import com.liferay.portal.kernel.util.MimeTypesUtil
@@ -25,10 +24,8 @@ import org.codehaus.jackson.Version
 import org.codehaus.jackson.map.ObjectMapper
 import org.codehaus.jackson.map.SerializationConfig
 import org.codehaus.jackson.map.module.SimpleModule
-import org.codehaus.jackson.map.util.ISO8601DateFormat
 
 import javax.portlet.*
-import java.text.SimpleDateFormat
 
 /**
  * Created with IntelliJ IDEA.

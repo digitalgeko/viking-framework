@@ -1,7 +1,6 @@
 package nl.viking.model.morphia
 
 import com.liferay.portal.kernel.search.IndexerRegistryUtil
-import com.liferay.portlet.asset.model.AssetEntry
 import groovy.json.JsonBuilder
 import nl.viking.controllers.Controller
 import nl.viking.db.MorphiaFactory
@@ -59,8 +58,8 @@ class Model implements Comparable<Model> {
     Model save() {
 		def h = Controller.currentDataHelper
 		if (h) {
-            this.groupId = this.properties.groupId ?: h.themeDisplay.scopeGroupId
-            this.companyId = this.properties.companyId ?: h.themeDisplay.companyId
+            this.groupId = this.groupId ?: h.themeDisplay.scopeGroupId
+            this.companyId = this.companyId ?: h.themeDisplay.companyId
 		}
 
 		def crudOperation
