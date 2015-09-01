@@ -1,8 +1,10 @@
 package nl.viking
 
+import com.liferay.portal.kernel.cache.SingleVMPoolUtil
 import com.liferay.portal.util.PortalUtil
 import groovy.transform.Synchronized
 import nl.viking.controllers.Controller
+import nl.viking.controllers.DataHelper
 import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render
 import nl.viking.controllers.annotation.Resource
@@ -20,6 +22,8 @@ class VikingPortlet extends GenericPortlet
 {
 	protected String defaultControllerName
 
+    String defaultControllerSimpleName
+
 	public static final ThreadLocal<Controller> controllerThreadLocal = new ThreadLocal();
 
 	public static final ThreadLocal<ServletContext> servletContextThreadLocal = new ThreadLocal();
@@ -36,11 +40,9 @@ class VikingPortlet extends GenericPortlet
 		servletContextThreadLocal.get()
 	}
 
-
     @Override @Synchronized
     void init() throws PortletException {
         super.init()
-
         Logger.info("Initializing %s...", getPortletName())
         if (!appInit) {
             appInit = true
@@ -48,12 +50,14 @@ class VikingPortlet extends GenericPortlet
             if (!defaultControllerName) {
                 def reflections = new Reflections("controllers")
                 Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
-                defaultControllerName = controllers.find{
+                def defaultController = controllers.find{
                     if (it) {
                         return it.simpleName.toLowerCase() == getPortletName()
                     }
                     return false
-                }.name
+                }
+                defaultControllerName = defaultController.name
+                defaultControllerSimpleName = defaultController.simpleName - "Portlet"
             }
             isDevEnabled = Conf.properties.dev.enabled
             if (isDevEnabled) {
@@ -188,10 +192,17 @@ class VikingPortlet extends GenericPortlet
 			def data = request.getAttribute(Conf.REQUEST_DATA_KEY+portletName)
 			TemplateUtils.writeToRequest(request, response, response.getPortletOutputStream(), viewTemplate, data)
 			return true
-		}else if (stringData) {
+		} else if (stringData) {
 			response.getPortletOutputStream().write(stringData.bytes)
 			return true
-		}
+		} else if (Conf.properties."$defaultControllerSimpleName".caching.enabled) {
+            def dataHelper = new DataHelper(request, response, request, null)
+            String cachedResponse = SingleVMPoolUtil.getCache(VikingPortlet.class.name).get(dataHelper.cacheKey)
+            if (cachedResponse) {
+                response.getPortletOutputStream().write(cachedResponse.bytes)
+                return true
+            }
+        }
 		return false
 	}
 

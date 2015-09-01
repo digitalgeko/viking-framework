@@ -143,4 +143,8 @@ class DataHelper {
 		}
 		themeDisplay.permissionChecker.hasPermission(groupId, resourceName, primKey, actionId)
 	}
+
+    String getCacheKey() {
+        "${getUser()?.userId ?: 'guest'}-${getThemeDisplay().plid}-${getPortletId()}"
+    }
 }

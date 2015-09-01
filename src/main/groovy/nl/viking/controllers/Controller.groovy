@@ -1,5 +1,6 @@
 package nl.viking.controllers
 
+import com.liferay.portal.kernel.cache.SingleVMPoolUtil
 import com.liferay.portal.kernel.dao.orm.DynamicQuery
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil
@@ -157,7 +158,15 @@ abstract class Controller {
         }
 
         if (!(response instanceof ActionResponse)) {
-            TemplateUtils.writeToRequest(portletRequest, response, outputStream, viewTemplate, data)
+            if (Conf.properties."$portlet.defaultControllerSimpleName".caching.enabled && !Conf.properties.dev.enabled) {
+                def stringWriter = new StringWriter()
+                TemplateUtils.writeToRequest(portletRequest, response, stringWriter, viewTemplate, data)
+                def stringResult = stringWriter.toString()
+                outputStream.write(stringResult.bytes)
+                SingleVMPoolUtil.getCache(VikingPortlet.class.name).put(h.cacheKey, stringResult, Conf.properties."$portlet.defaultControllerSimpleName".caching.timeToLive)
+            } else {
+                TemplateUtils.writeToRequest(portletRequest, response, outputStream, viewTemplate, data)
+            }
         } else {
 			portletRequest.setAttribute(Conf.REQUEST_TEMPLATE_KEY+portlet.portletName, viewTemplate)
 			portletRequest.setAttribute(Conf.REQUEST_DATA_KEY+portlet.portletName, data)

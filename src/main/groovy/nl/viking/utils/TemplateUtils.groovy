@@ -25,10 +25,15 @@ class TemplateUtils {
 	private static Configuration freemarkerConfigurationSingleton
 
 	static writeToOutputStream (viewTemplate, outputStream, data) {
-		def cfg = getFreemarkerConfiguration();
-		Template template = cfg.getTemplate(viewTemplate);
-		Writer out = new OutputStreamWriter(outputStream);
-		template.process(data, out);
+		def cfg = getFreemarkerConfiguration()
+		Template template = cfg.getTemplate(viewTemplate)
+        Writer out
+        if (outputStream instanceof Writer) {
+            out = outputStream
+        } else {
+            out = new OutputStreamWriter(outputStream)
+        }
+		template.process(data, out)
 		out.flush();
 	}
 	static writeToRequest (request, response, outputStream, viewTemplate, data) {
