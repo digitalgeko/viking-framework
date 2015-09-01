@@ -1,5 +1,21 @@
 # Release notes
 
+## 0.4.0
+
+### Caching
+To cache the response of your portlet for N seconds, just add a "caching" section on your portlet's configuration, example for 300 seconds (5 minutes):
+
+```
+MyPortlet {
+	// ...
+	caching {
+		enabled = true
+		timeToLive = 300 // secs
+	}
+}
+``` 
+
+
 ## 0.3.1
 
 * Added Bootstrap listener to use with web.xml (in order to init viking when running arquillian tests)
