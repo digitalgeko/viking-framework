@@ -8,7 +8,7 @@ package nl.viking.arquillian.deployment
 class VikingTestDeploymentHelper {
 
 	static File getWarFile() {
-		new File(System.properties.getProperty("viking.test.warFilePath"))
+        new File(System.properties.getProperty("viking.test.warFilePath"))
 	}
 
 }

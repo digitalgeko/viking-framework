@@ -1,18 +1,19 @@
 package nl.viking
 
+import com.liferay.portal.kernel.cache.SingleVMPoolUtil
 import com.liferay.portal.util.PortalUtil
+import groovy.transform.Synchronized
 import nl.viking.controllers.Controller
+import nl.viking.controllers.DataHelper
 import nl.viking.controllers.annotation.Action
 import nl.viking.controllers.annotation.Render
 import nl.viking.controllers.annotation.Resource
 import nl.viking.db.HibernateFactory
-import nl.viking.enhancers.ModelEnhancer
 import nl.viking.logging.Logger
-import nl.viking.utils.*
+import nl.viking.utils.RenderUtils
+import nl.viking.utils.TemplateUtils
 import org.reflections.Reflections
 
-import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
 import javax.portlet.*
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpServletRequest
@@ -21,11 +22,15 @@ class VikingPortlet extends GenericPortlet
 {
 	protected String defaultControllerName
 
+    String defaultControllerSimpleName
+
 	public static final ThreadLocal<Controller> controllerThreadLocal = new ThreadLocal();
 
 	public static final ThreadLocal<ServletContext> servletContextThreadLocal = new ThreadLocal();
 
 	public boolean isDevEnabled = false
+
+    public boolean appInit = false
 
 	static Controller getCurrentController() {
 		controllerThreadLocal.get()
@@ -35,26 +40,34 @@ class VikingPortlet extends GenericPortlet
 		servletContextThreadLocal.get()
 	}
 
-	@PostConstruct
-	def void init() {
-		Logger.info("Initializing %s...", getPortletName())
-		if (!defaultControllerName) {
-			def reflections = new Reflections("controllers")
-			Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
-			defaultControllerName = controllers.find{
-				if (it) {
-					return it.simpleName.toLowerCase() == getPortletName()
-				}
-				return false
-			}.name
-		}
-		isDevEnabled = Conf.properties.dev.enabled
-		if (isDevEnabled) {
-			Logger.info("Running viking on DEV mode!")
-		}
-	}
+    @Override @Synchronized
+    void init() throws PortletException {
+        super.init()
+        Logger.info("Initializing %s...", getPortletName())
+        if (!appInit) {
+            appInit = true
 
-	def loadDevController(controllerName) {
+            if (!defaultControllerName) {
+                def reflections = new Reflections("controllers")
+                Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
+                def defaultController = controllers.find{
+                    if (it) {
+                        return it.simpleName.toLowerCase() == getPortletName()
+                    }
+                    return false
+                }
+                defaultControllerName = defaultController.name
+                defaultControllerSimpleName = defaultController.simpleName - "Portlet"
+            }
+            isDevEnabled = Conf.properties.dev.enabled
+            if (isDevEnabled) {
+                Logger.info("Running viking on DEV mode!")
+            }
+        }
+
+    }
+
+    def loadDevController(controllerName) {
 		def cl = new GroovyClassLoader(this.class.classLoader) {
 			@Override
 			protected void setClassCacheEntry(Class cls) {
@@ -179,10 +192,17 @@ class VikingPortlet extends GenericPortlet
 			def data = request.getAttribute(Conf.REQUEST_DATA_KEY+portletName)
 			TemplateUtils.writeToRequest(request, response, response.getPortletOutputStream(), viewTemplate, data)
 			return true
-		}else if (stringData) {
+		} else if (stringData) {
 			response.getPortletOutputStream().write(stringData.bytes)
 			return true
-		}
+		} else if (Conf.properties."$defaultControllerSimpleName".caching.enabled) {
+            def dataHelper = new DataHelper(request, response, request, null)
+            String cachedResponse = SingleVMPoolUtil.getCache(VikingPortlet.class.name).get(dataHelper.cacheKey)
+            if (cachedResponse) {
+                response.getPortletOutputStream().write(cachedResponse.bytes)
+                return true
+            }
+        }
 		return false
 	}
 

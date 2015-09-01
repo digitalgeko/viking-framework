@@ -17,21 +17,29 @@ import javax.servlet.ServletContextListener
  */
 class BootstrapListener implements ServletContextListener {
 
+    private static volatile boolean applicationStarted = false;
+
 	@Override
 	void contextInitialized(ServletContextEvent sce) {
-		ModelEnhancer.enhanceAllModels()
+        if (!applicationStarted) {
+            applicationStarted = true;
+            ModelEnhancer.enhanceAllModels()
 
-		ModelResourcesUtils.registerAllModels(sce.servletContext)
+            ModelResourcesUtils.registerAllModels(sce.servletContext)
 
-		IndexerUtils.registerAllModelIndexers()
+            IndexerUtils.registerAllModelIndexers()
 
-		AssetFactoryUtils.registerAllFactories()
+            AssetFactoryUtils.registerAllFactories()
 
-		WorkflowUtils.registerHandlers()
+            WorkflowUtils.registerHandlers()
+        }
 	}
 
 	@Override
 	void contextDestroyed(ServletContextEvent sce) {
-		HibernateFactory.destroy()
+        if (applicationStarted) {
+            applicationStarted = false;
+            HibernateFactory.destroy()
+        }
 	}
 }

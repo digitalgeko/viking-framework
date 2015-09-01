@@ -58,8 +58,8 @@ class Model implements Comparable<Model> {
     Model save() {
 		def h = Controller.currentDataHelper
 		if (h) {
-			groupId = groupId ?: h.themeDisplay.scopeGroupId
-			companyId = companyId ?: h.themeDisplay.companyId
+            this.groupId = this.groupId ?: h.themeDisplay.scopeGroupId
+            this.companyId = this.companyId ?: h.themeDisplay.companyId
 		}
 
 		def crudOperation

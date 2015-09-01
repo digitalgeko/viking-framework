@@ -25,10 +25,15 @@ class TemplateUtils {
 	private static Configuration freemarkerConfigurationSingleton
 
 	static writeToOutputStream (viewTemplate, outputStream, data) {
-		def cfg = getFreemarkerConfiguration();
-		Template template = cfg.getTemplate(viewTemplate);
-		Writer out = new OutputStreamWriter(outputStream);
-		template.process(data, out);
+		def cfg = getFreemarkerConfiguration()
+		Template template = cfg.getTemplate(viewTemplate)
+        Writer out
+        if (outputStream instanceof Writer) {
+            out = outputStream
+        } else {
+            out = new OutputStreamWriter(outputStream)
+        }
+		template.process(data, out)
 		out.flush();
 	}
 	static writeToRequest (request, response, outputStream, viewTemplate, data) {
@@ -37,7 +42,7 @@ class TemplateUtils {
 	}
 
 	static fillTemplateVariables(request, response, data) {
-		DataHelper dataHelper = new DataHelper(request, response, request)
+		DataHelper dataHelper = new DataHelper(request, response, request, VikingPortlet.currentController.class)
 		data["JS_ROUTER_PARAMETER_PREFIX"] = Conf.JS_ROUTER_PARAMETER_PREFIX
 		data["route"] = new RouterFreemarkerMethod(response:response, request: request)
 		data["jsRoute"] = new JSRouterFreemarkerMethod(response:response, request: request)

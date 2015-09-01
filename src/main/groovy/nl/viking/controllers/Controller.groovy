@@ -1,8 +1,8 @@
 package nl.viking.controllers
 
+import com.liferay.portal.kernel.cache.SingleVMPoolUtil
 import com.liferay.portal.kernel.dao.orm.DynamicQuery
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil
-import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil
 import com.liferay.portal.kernel.servlet.HttpHeaders
 import com.liferay.portal.kernel.util.MimeTypesUtil
@@ -25,10 +25,8 @@ import org.codehaus.jackson.Version
 import org.codehaus.jackson.map.ObjectMapper
 import org.codehaus.jackson.map.SerializationConfig
 import org.codehaus.jackson.map.module.SimpleModule
-import org.codehaus.jackson.map.util.ISO8601DateFormat
 
 import javax.portlet.*
-import java.text.SimpleDateFormat
 
 /**
  * Created with IntelliJ IDEA.
@@ -82,7 +80,7 @@ abstract class Controller {
 
     DataHelper getH() {
         if (h == null) {
-			h = new DataHelper(request, response, portletRequest)
+			h = new DataHelper(request, response, portletRequest, this.class)
         }
         return h
     }
@@ -160,7 +158,15 @@ abstract class Controller {
         }
 
         if (!(response instanceof ActionResponse)) {
-            TemplateUtils.writeToRequest(portletRequest, response, outputStream, viewTemplate, data)
+            if (Conf.properties."$portlet.defaultControllerSimpleName".caching.enabled && !Conf.properties.dev.enabled) {
+                def stringWriter = new StringWriter()
+                TemplateUtils.writeToRequest(portletRequest, response, stringWriter, viewTemplate, data)
+                def stringResult = stringWriter.toString()
+                outputStream.write(stringResult.bytes)
+                SingleVMPoolUtil.getCache(VikingPortlet.class.name).put(h.cacheKey, stringResult, Conf.properties."$portlet.defaultControllerSimpleName".caching.timeToLive)
+            } else {
+                TemplateUtils.writeToRequest(portletRequest, response, outputStream, viewTemplate, data)
+            }
         } else {
 			portletRequest.setAttribute(Conf.REQUEST_TEMPLATE_KEY+portlet.portletName, viewTemplate)
 			portletRequest.setAttribute(Conf.REQUEST_DATA_KEY+portlet.portletName, data)
@@ -291,14 +297,9 @@ abstract class Controller {
 		final DynamicQuery tagsQuery = DynamicQueryFactoryUtil.forClass(AssetTag.class, PortalClassLoaderUtil.classLoader)
 		tagsQuery.add(PropertyFactoryUtil.forName("name").like(params.query+"%"))
         tagsQuery.add(PropertyFactoryUtil.forName("companyId").eq(h.themeDisplay.companyId))
-		if (h.user) {
-			tagsQuery.add(PropertyFactoryUtil.forName("groupId").in(h.user.groupIds))
-		} else {
-			tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
-		}
+        tagsQuery.add(PropertyFactoryUtil.forName("groupId").eq(h.themeDisplay.scopeGroupId))
 
-		tagsQuery.setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property("name")))
-		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {[text: it]}
+		def tags = AssetTagLocalServiceUtil.dynamicQuery(tagsQuery).collect {AssetTag tag -> [text: tag.name, tagId: tag.tagId]}
 
 		renderJSON(tags)
 	}
