@@ -145,6 +145,6 @@ class DataHelper {
 	}
 
     String getCacheKey() {
-        "${getUser()?.userId ?: 'guest'}-${getThemeDisplay().plid}-${getPortletId()}"
+        "${getUser()?.userId ?: 'guest'}-${getThemeDisplay().plid}-${getPortletId()}-${getPortletRequest().portletMode}"
     }
 }
