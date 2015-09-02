@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.4.1
+
+CACHING BUG FIXES
+
 ## 0.4.0
 
 ### Caching
