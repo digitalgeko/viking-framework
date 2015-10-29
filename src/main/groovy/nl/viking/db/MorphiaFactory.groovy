@@ -2,6 +2,7 @@ package nl.viking.db
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
+import com.mongodb.ServerAddress
 import org.mongodb.morphia.Datastore
 import org.mongodb.morphia.Morphia
 
@@ -20,11 +21,12 @@ class MorphiaFactory {
 
     static Datastore ds() {
         if (dataStore == null  && GMongoProps.getDBHost()) {
-            def mongo = new MongoClient(GMongoProps.getDBHost(), GMongoProps.getDBPort())
+            List<MongoCredential> credentialsList = []
             if (GMongoProps.getDBUsername() != null) {
-				def credentials = MongoCredential.createMongoCRCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
-				mongo.credentialsList.add(credentials)
+                def credentials = MongoCredential.createMongoCRCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
+                credentialsList.add(credentials)
             }
+            def mongo = new MongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentialsList)
 			dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
         }
         return dataStore
