@@ -23,11 +23,11 @@ class MorphiaFactory {
         if (dataStore == null  && GMongoProps.getDBHost()) {
             List<MongoCredential> credentialsList = []
             if (GMongoProps.getDBUsername() != null) {
-                def credentials = MongoCredential.createMongoCRCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
+                def credentials = MongoCredential.createCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
                 credentialsList.add(credentials)
             }
             def mongo = new MongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentialsList)
-			dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
+            dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
         }
         return dataStore
     }

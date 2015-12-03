@@ -1,5 +1,18 @@
 # Release notes
 
+## 0.4.3
+
+Morphia upgrade to 1.0.1
+Default liferay version set to 6.2.3
+
+## 0.4.2
+
+Bug fixes
+
+## 0.4.1
+
+Bug fixes
+
 ## 0.4.0
 
 ### Caching
