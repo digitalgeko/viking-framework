@@ -1,6 +1,7 @@
 package nl.viking.listeners
 
 import nl.viking.db.HibernateFactory
+import nl.viking.db.MorphiaFactory
 import nl.viking.enhancers.ModelEnhancer
 import nl.viking.utils.AssetFactoryUtils
 import nl.viking.utils.IndexerUtils
@@ -35,10 +36,12 @@ class BootstrapListener implements ServletContextListener {
         }
 	}
 
+
 	@Override
 	void contextDestroyed(ServletContextEvent sce) {
         if (applicationStarted) {
             applicationStarted = false;
+            MorphiaFactory.destroy()
             HibernateFactory.destroy()
         }
 	}
