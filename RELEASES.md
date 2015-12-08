@@ -2,8 +2,9 @@
 
 ## 0.4.3
 
-Morphia upgrade to 1.0.1
-Default liferay version set to 6.2.3
+* Morphia upgrade to 1.0.1
+* Default liferay version set to 6.2.3
+* Bug fixes
 
 ## 0.4.2
 
