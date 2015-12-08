@@ -1,10 +1,13 @@
 package nl.viking.db
 
+import com.mongodb.Mongo
 import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import org.mongodb.morphia.Datastore
 import org.mongodb.morphia.Morphia
+
+import javax.annotation.PreDestroy
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,23 +17,23 @@ import org.mongodb.morphia.Morphia
  * To change this template use File | Settings | File Templates.
  */
 class MorphiaFactory {
-    
-    static Datastore dataStore = null
+
+	static Datastore dataStore = null
 
 	static Boolean isMongoDefined
 
-    static Datastore ds() {
-        if (dataStore == null  && GMongoProps.getDBHost()) {
-            List<MongoCredential> credentialsList = []
-            if (GMongoProps.getDBUsername() != null) {
-                def credentials = MongoCredential.createCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
-                credentialsList.add(credentials)
-            }
-            def mongo = new MongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentialsList)
-            dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
-        }
-        return dataStore
-    }
+	static Datastore ds() {
+		if (dataStore == null  && GMongoProps.getDBHost()) {
+			List<MongoCredential> credentialsList = []
+			if (GMongoProps.getDBUsername() != null) {
+				def credentials = MongoCredential.createCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
+				credentialsList.add(credentials)
+			}
+			def mongo = new MongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentialsList)
+			dataStore = new Morphia().createDatastore(mongo, GMongoProps.getDBName())
+		}
+		return dataStore
+	}
 
 	static Boolean hasMongo() {
 		return this.isMongoDefined;
@@ -47,6 +50,14 @@ class MorphiaFactory {
 		}
 
 		return isMongoDefined
+	}
+
+	static destroy() {
+		if (dataStore) {
+			dataStore.mongo.close()
+			dataStore = null
+		}
+
 	}
 
 }
