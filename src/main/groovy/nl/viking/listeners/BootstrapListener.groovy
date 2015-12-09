@@ -1,5 +1,6 @@
 package nl.viking.listeners
 
+import nl.viking.db.GMongoDBFactory
 import nl.viking.db.HibernateFactory
 import nl.viking.db.MorphiaFactory
 import nl.viking.enhancers.ModelEnhancer
@@ -42,6 +43,7 @@ class BootstrapListener implements ServletContextListener {
         if (applicationStarted) {
             applicationStarted = false;
             MorphiaFactory.destroy()
+            GMongoDBFactory.destroy()
             HibernateFactory.destroy()
         }
 	}

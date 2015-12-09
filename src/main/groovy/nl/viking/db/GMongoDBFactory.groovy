@@ -1,7 +1,9 @@
 package nl.viking.db
 
-import com.gmongo.GMongo
+import com.gmongo.GMongoClient
 import com.mongodb.DB
+import com.mongodb.MongoCredential
+import com.mongodb.ServerAddress
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,12 +18,20 @@ class GMongoDBFactory {
 
     static DB getDb() {
         if (db == null) {
-            def mongo = new GMongo(GMongoProps.getDBHost(), GMongoProps.getDBPort())
-            db = mongo.getDB(GMongoProps.getDBName())
+            def credentials = []
             if (GMongoProps.getDBUsername() != null) {
-                db.authenticate(GMongoProps.getDBUsername(), GMongoProps.getDBPassword().toCharArray());
+                credentials << MongoCredential.createCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
             }
+            def mongo = new GMongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentials)
+            db = mongo.getDB(GMongoProps.getDBName())
         }
         return db
+    }
+
+    static destroy() {
+        if (db) {
+            db.mongo.close()
+            db = null
+        }
     }
 }
