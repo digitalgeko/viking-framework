@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.4.4
+
+* Using latest version of gmongo
+* Closing gmongo when undeploying
+
 ## 0.4.3
 
 Morphia upgrade to 1.0.1
