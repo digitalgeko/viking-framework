@@ -2,9 +2,10 @@ package nl.viking.db
 
 import com.gmongo.GMongoClient
 import com.mongodb.DB
-import com.mongodb.MongoClientOptions
+import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
+import nl.viking.logging.Logger
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,10 +28,14 @@ class GMongoDBFactory {
             }
 			def serverAddresses = GMongoProps.getDBServerAddresses()
 			if (serverAddresses) {
-				def seeds = serverAddresses.collect {
-					new ServerAddress(it.host, it.port ?: GMongoProps.getDBPort())
-				}
-				mongo = new GMongoClient(seeds, credentials)
+                Logger.debug "serverAddresses value $serverAddresses"
+                def seeds = serverAddresses.collect {
+                    def cleanString = it.split(":")
+                    def host = cleanString[0].toString()
+                    def port = cleanString.length > 1 ? cleanString[1] as int : null
+                    new ServerAddress(host, port ?: GMongoProps.getDBPort())
+                }
+                mongo = new MongoClient(seeds, credentials)
 			} else {
 				mongo = new GMongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentials)
 			}

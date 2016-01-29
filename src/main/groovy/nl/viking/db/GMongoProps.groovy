@@ -19,9 +19,9 @@ class GMongoProps {
         return Conf.properties.mongo.db.host;
     }
 
-	public static String getDBServerAddresses() {
+	public static String[] getDBServerAddresses() {
 		if (PropsUtil.contains("mongo.db.serverAddresses")) {
-			return PropsUtil.get("mongo.db.serverAddresses")
+			return PropsUtil.getArray("mongo.db.serverAddresses")
 		}
 		return Conf.properties.mongo.db.serverAddresses;
 	}
