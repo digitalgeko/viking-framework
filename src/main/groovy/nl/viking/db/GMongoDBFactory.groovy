@@ -35,7 +35,7 @@ class GMongoDBFactory {
                     def port = cleanString.length > 1 ? cleanString[1] as int : null
                     new ServerAddress(host, port ?: GMongoProps.getDBPort())
                 }
-                mongo = new MongoClient(seeds, credentials)
+				mongo = new GMongoClient(seeds, credentials)
 			} else {
 				mongo = new GMongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentials)
 			}
