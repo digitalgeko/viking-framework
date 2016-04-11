@@ -8,7 +8,7 @@ apply plugin: 'sonar-runner'
 
 def groupId = 'org.vikingportlets'
 def artifactId = project.name
-def versionNumber = '0.4.5'
+def versionNumber = '0.4.6'
 
 group = groupId
 version = versionNumber
@@ -111,4 +111,4 @@ uploadArchives {
             pom.groupId = groupId
         }
     }
-}   
+}

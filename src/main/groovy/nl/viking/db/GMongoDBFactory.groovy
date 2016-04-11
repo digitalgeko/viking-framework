@@ -2,7 +2,6 @@ package nl.viking.db
 
 import com.gmongo.GMongoClient
 import com.mongodb.DB
-import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import nl.viking.logging.Logger
@@ -36,6 +35,7 @@ class GMongoDBFactory {
                     new ServerAddress(host, port ?: GMongoProps.getDBPort())
                 }
 				mongo = new GMongoClient(seeds, credentials)
+
 			} else {
 				mongo = new GMongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentials)
 			}
@@ -47,8 +47,13 @@ class GMongoDBFactory {
 
     static destroy() {
         if (mongo) {
-            mongo.close()
-            mongo = null
+            try {
+                mongo.close()
+            } catch (e) {
+                Logger.warn("Mongo client was not successfully closed")
+            } finally {
+                mongo = null
+            }
         }
     }
 }
