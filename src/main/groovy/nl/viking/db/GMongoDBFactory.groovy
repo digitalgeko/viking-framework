@@ -47,8 +47,13 @@ class GMongoDBFactory {
 
     static destroy() {
         if (mongo) {
-            mongo.close()
-            mongo = null
+            try {
+                mongo.close()
+            } catch (e) {
+                Logger.warn("Mongo client was not successfully closed")
+            } finally {
+                mongo = null
+            }
         }
     }
 }
