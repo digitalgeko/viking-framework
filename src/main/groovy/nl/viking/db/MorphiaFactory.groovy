@@ -1,7 +1,9 @@
 package nl.viking.db
 
 import com.mongodb.MongoClient
+import com.mongodb.MongoClientOptions
 import com.mongodb.MongoCredential
+import com.mongodb.MongoException
 import com.mongodb.ServerAddress
 import nl.viking.logging.Logger
 import org.mongodb.morphia.Datastore
@@ -22,7 +24,7 @@ class MorphiaFactory {
 	static Boolean isMongoDefined
 
 	static Datastore ds() {
-		if (dataStore == null  && GMongoProps.getDBHost()) {
+		if ((dataStore == null  && GMongoProps.getDBHost()) || (dataStore == null  && GMongoProps.getDBServerAddresses())) {
 			List<MongoCredential> credentialsList = []
 			if (GMongoProps.getDBUsername() != null) {
 				def credentials = MongoCredential.createCredential(GMongoProps.getDBUsername(), GMongoProps.getDBName(), GMongoProps.getDBPassword().toCharArray())
@@ -33,11 +35,15 @@ class MorphiaFactory {
 			def serverAddresses = GMongoProps.getDBServerAddresses()
 			if (serverAddresses) {
 				Logger.debug "serverAddresses value $serverAddresses"
-				def seeds = serverAddresses.collect {
-					def cleanString = it.split(":")
-					def host = cleanString[0].toString()
+				List<ServerAddress> seeds = []
+
+				for (String t : serverAddresses) {
+					t = t.replace("[", "").replace("]","")
+					def cleanString = t.split(":")
+					def host = cleanString[0].toString() as String
 					def port = cleanString.length > 1 ? cleanString[1] as int : null
-					new ServerAddress(host, port ?: GMongoProps.getDBPort())
+					def seed = new ServerAddress(host, port ?: GMongoProps.getDBPort())
+					seeds.add(seed)
 				}
 				mongo = new MongoClient(seeds, credentialsList)
 			} else {
