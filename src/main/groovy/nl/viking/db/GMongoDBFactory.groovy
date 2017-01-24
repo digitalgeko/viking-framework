@@ -27,14 +27,17 @@ class GMongoDBFactory {
             }
 			def serverAddresses = GMongoProps.getDBServerAddresses()
 			if (serverAddresses) {
-                Logger.debug "serverAddresses value $serverAddresses"
-                def seeds = serverAddresses.collect {
-                    def cleanString = it.split(":")
-                    def host = cleanString[0].toString()
+                List<ServerAddress> seeds = []
+
+                for (String t : serverAddresses) {
+                    t = t.replace("[", "").replace("]","")
+                    def cleanString = t.split(":")
+                    def host = cleanString[0].toString() as String
                     def port = cleanString.length > 1 ? cleanString[1] as int : null
-                    new ServerAddress(host, port ?: GMongoProps.getDBPort())
+                    def seed = new ServerAddress(host, port ?: GMongoProps.getDBPort())
+                    seeds.add(seed)
                 }
-				mongo = new GMongoClient(seeds, credentials)
+                mongo = new GMongoClient(seeds, credentials)
 
 			} else {
 				mongo = new GMongoClient(new ServerAddress(GMongoProps.getDBHost(), GMongoProps.getDBPort()), credentials)
